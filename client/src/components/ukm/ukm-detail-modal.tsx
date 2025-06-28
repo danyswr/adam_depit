@@ -110,11 +110,11 @@ export default function UKMDetailModal({ ukm, open, onOpenChange }: UKMDetailMod
               <div className="flex items-center text-gray-600 space-x-4">
                 <div className="flex items-center">
                   <Users className="h-4 w-4 mr-1" />
-                  0 Anggota
+                  Anggota Aktif
                 </div>
                 <div className="flex items-center">
                   <Calendar className="h-4 w-4 mr-1" />
-                  Didirikan {new Date(ukm.created_at).getFullYear()}
+                  Status Aktif
                 </div>
               </div>
             </div>

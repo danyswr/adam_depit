@@ -20,10 +20,12 @@ export default function UKMCard({ ukm, onViewDetail, showActions = false, onEdit
   const defaultImage = "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=400";
 
   // Fetch member count for this UKM
-  const { data: memberCountData } = useQuery({
-    queryKey: ['/api/ukm-members', ukm.id_ukm],
+  const { data: memberCountData, isLoading: memberCountLoading } = useQuery({
+    queryKey: ['ukm-member-count', ukm.id_ukm],
     queryFn: () => getUKMMemberCount(ukm.id_ukm),
     enabled: !!ukm.id_ukm,
+    staleTime: 0, // Always refetch
+    refetchOnMount: true,
   });
 
   const memberCount = memberCountData?.success ? (memberCountData.data || 0) : 0;
@@ -74,7 +76,7 @@ export default function UKMCard({ ukm, onViewDetail, showActions = false, onEdit
           </div>
           <div className="flex items-center">
             <Users className="h-4 w-4 mr-1" />
-            {memberCount} Anggota
+            {memberCountLoading ? "..." : `${memberCount} Anggota`}
           </div>
         </div>
       </CardContent>

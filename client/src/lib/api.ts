@@ -245,7 +245,7 @@ export async function getUKMMemberCount(ukmId: string) {
     const registrations = response.data.filter((row: any[]) => {
       return row[2] && row[2] === ukmId;
     });
-    console.log('Member count for UKM', ukmId, ':', registrations.length, 'registrations:', registrations);
+
     return {
       success: true,
       data: registrations.length
