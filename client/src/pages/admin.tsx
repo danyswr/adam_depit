@@ -49,6 +49,7 @@ import { useQuery } from "@tanstack/react-query"
 import UKMFormModal from "@/components/ukm/ukm-form-modal"
 import UKMDetailModal from "@/components/ukm/ukm-detail-modal"
 import UKMMembersModal from "@/components/ukm/ukm-members-modal"
+import UKMCard from "@/components/ukm/ukm-card"
 import type { UKM } from "@shared/schema"
 import { Link } from "wouter"
 import { getAllRegistrations } from "@/lib/api"
@@ -444,145 +445,31 @@ export default function Admin() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {filteredUKMs.map((ukm: any) => {
-                    // Use same image transformation logic as UKM card
-                    const defaultImage = "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400";
-                    let imageUrl = ukm.gambar_url && ukm.gambar_url.trim() !== "" ? ukm.gambar_url : defaultImage;
-                    
-                    if (imageUrl && imageUrl.includes("drive.google.com")) {
-                      const fileIdMatch = imageUrl.match(/(?:\/d\/|id=|&id=)([a-zA-Z0-9-_]+)/);
-                      if (fileIdMatch && fileIdMatch[1]) {
-                        imageUrl = `https://drive.google.com/thumbnail?id=${fileIdMatch[1]}&sz=w800`;
-                      }
-                    }
-
-                    const memberCount = registrations.filter((reg: any) => reg[2] === ukm.id_ukm).length;
-
-                    return (
-                      <Card
-                        key={ukm.id_ukm}
-                        className="group overflow-hidden bg-white border border-slate-200/50 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-[1.02] hover:-translate-y-1"
-                      >
-                        {/* Image Header */}
-                        <div className="relative h-40 overflow-hidden">
-                          <img
-                            src={imageUrl}
-                            alt={ukm.nama_ukm}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              if (target.src !== defaultImage) {
-                                target.src = defaultImage;
-                              }
-                            }}
-                          />
-                          {/* Gradient Overlay */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                          
-                          {/* Status Badge */}
-                          <div className="absolute top-3 left-3">
-                            <Badge className="text-xs bg-green-500/90 backdrop-blur-sm text-white border-0 shadow-lg">
-                              <div className="w-1.5 h-1.5 bg-white rounded-full mr-1 animate-pulse" />
-                              Aktif
-                            </Badge>
-                          </div>
-                        </div>
-
-                        {/* Content */}
-                        <CardContent className="p-4">
-                          {/* Title */}
-                          <div className="flex items-start justify-between mb-3">
-                            <h3 className="text-lg font-bold text-slate-800 group-hover:text-blue-600 transition-colors duration-300 line-clamp-2 flex-1">
-                              {ukm.nama_ukm || 'Nama UKM tidak tersedia'}
-                            </h3>
-                          </div>
-
-                          {/* Description */}
-                          <p className="text-slate-600 mb-4 line-clamp-3 leading-relaxed text-sm">
-                            {ukm.deskripsi || 'Deskripsi tidak tersedia'}
-                          </p>
-
-                          {/* Stats */}
-                          <div className="grid grid-cols-2 gap-3 mb-4">
-                            <div className="flex items-center bg-slate-50 rounded-lg p-3 border border-slate-200/50">
-                              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                                <Users className="h-4 w-4 text-blue-600" />
-                              </div>
-                              <div>
-                                <div className="text-sm font-semibold text-slate-800">{memberCount}</div>
-                                <div className="text-xs text-slate-600">Anggota</div>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center bg-slate-50 rounded-lg p-3 border border-slate-200/50">
-                              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                                <Calendar className="h-4 w-4 text-green-600" />
-                              </div>
-                              <div>
-                                <div className="text-sm font-semibold text-slate-800">Aktif</div>
-                                <div className="text-xs text-slate-600">Status</div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Additional Info */}
-                          <div className="flex items-center justify-between text-xs text-slate-500 mb-4">
-                            <div className="flex items-center">
-                              <Clock className="w-3 h-3 mr-1" />
-                              <span>Dibuat {new Date().toLocaleDateString("id-ID")}</span>
-                            </div>
-                          </div>
-                        </CardContent>
-
-                        {/* Actions */}
-                        <div className="px-4 pb-4">
-                          <div className="flex gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="flex-1 border-slate-200 text-slate-600 hover:bg-slate-50 transition-all duration-300"
-                              onClick={() => setSelectedUKM(ukm)}
-                            >
-                              <Eye className="mr-2 w-4 h-4" />
-                              Detail
-                            </Button>
-                            
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50 transition-all duration-300"
-                              onClick={() => handleViewMembers(ukm)}
-                            >
-                              <Users className="mr-2 w-4 h-4" />
-                              Anggota
-                            </Button>
-                          </div>
-                          
-                          <div className="flex gap-2 mt-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="flex-1 border-amber-200 text-amber-600 hover:bg-amber-50 transition-all duration-300"
-                              onClick={() => handleEditUKM(ukm)}
-                            >
-                              <Edit className="mr-2 w-4 h-4" />
-                              Edit
-                            </Button>
-                            
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="flex-1 border-red-200 text-red-600 hover:bg-red-50 transition-all duration-300"
-                              onClick={() => setDeletingUKM(ukm)}
-                            >
-                              <Trash2 className="mr-2 w-4 h-4" />
-                              Hapus
-                            </Button>
-                          </div>
-                        </div>
-                      </Card>
-                    );
-                  })}
+                  {filteredUKMs.map((ukm: any, index: number) => (
+                    <div
+                      key={ukm.id_ukm}
+                      className="animate-in fade-in slide-in-from-bottom-4 duration-700"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <UKMCard
+                        ukm={ukm}
+                        onViewDetail={setSelectedUKM}
+                        showActions={true}
+                        onEdit={(ukm) => {
+                          setEditingUKM(ukm);
+                          setShowUKMForm(true);
+                        }}
+                        onDelete={(ukm) => {
+                          setDeletingUKM(ukm);
+                        }}
+                        onMembersClick={(ukm) => {
+                          setSelectedUKMForMembers(ukm);
+                          setShowMembersModal(true);
+                        }}
+                        isAdmin={true}
+                      />
+                    </div>
+                  ))}
                 </div>
               )}
             </CardContent>
@@ -634,5 +521,5 @@ export default function Admin() {
         onOpenChange={setShowMembersModal}
       />
     </div>
-  )
+  );
 }

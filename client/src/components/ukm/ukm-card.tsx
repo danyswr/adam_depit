@@ -35,7 +35,9 @@ interface UKMCardProps {
   onEdit?: (ukm: UKM) => void;
   onDelete?: (ukm: UKM) => void;
   onJoinUKM?: (ukm: UKM) => void;
+  onMembersClick?: (ukm: UKM) => void;
   showJoinButton?: boolean;
+  isAdmin?: boolean;
 }
 
 export default function UKMCard({
@@ -45,7 +47,9 @@ export default function UKMCard({
   onEdit,
   onDelete,
   onJoinUKM,
+  onMembersClick,
   showJoinButton = false,
+  isAdmin = false,
 }: UKMCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -291,6 +295,16 @@ export default function UKMCard({
 
           {showActions && (
             <div className="flex gap-2">
+              {onMembersClick && isAdmin && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8 border-green-300 text-green-700 hover:bg-green-50 hover:text-green-800 hover:border-green-400 transition-all duration-300 bg-transparent"
+                  onClick={() => onMembersClick(ukm)}
+                >
+                  <Users className="w-3 h-3" />
+                </Button>
+              )}
               {onEdit && (
                 <Button
                   variant="outline"
