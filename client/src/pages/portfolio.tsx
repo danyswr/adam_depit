@@ -29,6 +29,11 @@ import {
   Code,
   Heart,
   Briefcase,
+  Filter,
+  SlidersHorizontal,
+  ArrowUpRight,
+  Clock,
+  MapPin,
 } from "lucide-react"
 import type { UKM } from "@shared/schema"
 import { useUKMs } from "@/hooks/use-ukm"
@@ -90,7 +95,7 @@ export default function Portfolio() {
 
   // Helper function to determine category from UKM name
   const getCategoryFromName = (name: string) => {
-    if (!name || typeof name !== 'string') return "all"
+    if (!name || typeof name !== "string") return "all"
     const lowerName = name.toLowerCase()
     if (lowerName.includes("seni") || lowerName.includes("musik") || lowerName.includes("teater")) return "seni"
     if (lowerName.includes("olahraga") || lowerName.includes("basket") || lowerName.includes("futsal"))
@@ -127,66 +132,93 @@ export default function Portfolio() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 opacity-40">
-        <div className="absolute top-10 left-10 w-2 h-2 bg-indigo-400 rounded-full"></div>
-        <div className="absolute top-20 right-20 w-2 h-2 bg-blue-400 rounded-full"></div>
-        <div className="absolute bottom-20 left-20 w-2 h-2 bg-indigo-400 rounded-full"></div>
-        <div className="absolute bottom-10 right-10 w-2 h-2 bg-blue-400 rounded-full"></div>
-        <div className="absolute top-32 left-32 w-1 h-1 bg-purple-400 rounded-full"></div>
-        <div className="absolute top-48 right-48 w-1 h-1 bg-indigo-300 rounded-full"></div>
-      </div>
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl -translate-y-48 translate-x-48"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-amber-400/20 to-orange-400/20 rounded-full blur-3xl translate-y-48 -translate-x-48"></div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fillRule=\"evenodd\"%3E%3Cg fill=\"%23f59e0b\" fillOpacity=\"0.03\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"2\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
 
       <div className="relative z-10">
         {/* Hero Section */}
-        <section className="pt-20 pb-16">
+        <section className="pt-24 pb-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Hero Header */}
             <div className="text-center mb-16">
-              <div className="flex justify-center mb-6">
-                <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-500 rounded-3xl flex items-center justify-center shadow-2xl">
-                  <Compass className="w-10 h-10 text-white" />
+              <div className="flex justify-center mb-8">
+                <div className="w-24 h-24 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 rounded-3xl flex items-center justify-center shadow-2xl">
+                  <Compass className="w-12 h-12 text-white" />
                 </div>
               </div>
               <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-slate-800 via-blue-800 to-purple-800 bg-clip-text text-transparent mb-6 leading-tight">
                 Portfolio UKM
               </h1>
-              <p className="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto leading-relaxed mb-8">
+              <p className="text-xl md:text-2xl text-slate-600 max-w-4xl mx-auto leading-relaxed mb-12">
                 Jelajahi berbagai Unit Kegiatan Mahasiswa dan temukan komunitas yang sesuai dengan passion Anda
               </p>
 
-              {/* Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-                <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/20">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                    <Target className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="text-3xl font-bold text-slate-800 mb-1">{stats.totalUKM}</div>
-                  <div className="text-sm text-slate-600">Total UKM</div>
-                </div>
-                <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/20">
-                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                    <Users className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="text-3xl font-bold text-slate-800 mb-1">{stats.activeMembers}</div>
-                  <div className="text-sm text-slate-600">Anggota Aktif</div>
-                </div>
-                <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/20">
-                  <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                    <Award className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="text-3xl font-bold text-slate-800 mb-1">{stats.achievements}</div>
-                  <div className="text-sm text-slate-600">Prestasi</div>
-                </div>
-                <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/20">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                    <Calendar className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="text-3xl font-bold text-slate-800 mb-1">{stats.events}</div>
-                  <div className="text-sm text-slate-600">Event</div>
-                </div>
+              {/* Enhanced Stats Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+                <Card className="bg-white/70 backdrop-blur-xl border-white/20 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 group">
+                  <CardContent className="p-6">
+                    <div className="flex flex-col items-center">
+                      <div className="w-14 h-14 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        <Target className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="text-3xl font-bold text-slate-800 mb-1">{stats.totalUKM}</div>
+                      <div className="text-sm text-slate-600 font-medium">Total UKM</div>
+                      <div className="flex items-center text-green-600 text-xs mt-2">
+                        <ArrowUpRight className="w-3 h-3 mr-1" />
+                        +15% bulan ini
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-white/70 backdrop-blur-xl border-white/20 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 group">
+                  <CardContent className="p-6">
+                    <div className="flex flex-col items-center">
+                      <div className="w-14 h-14 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        <Users className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="text-3xl font-bold text-slate-800 mb-1">{stats.activeMembers}</div>
+                      <div className="text-sm text-slate-600 font-medium">Anggota Aktif</div>
+                      <div className="flex items-center text-green-600 text-xs mt-2">
+                        <ArrowUpRight className="w-3 h-3 mr-1" />
+                        +8% minggu ini
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-white/70 backdrop-blur-xl border-white/20 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 group">
+                  <CardContent className="p-6">
+                    <div className="flex flex-col items-center">
+                      <div className="w-14 h-14 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        <Award className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="text-3xl font-bold text-slate-800 mb-1">{stats.achievements}</div>
+                      <div className="text-sm text-slate-600 font-medium">Prestasi</div>
+                      <div className="flex items-center text-green-600 text-xs mt-2">
+                        <ArrowUpRight className="w-3 h-3 mr-1" />
+                        +24% tahun ini
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-white/70 backdrop-blur-xl border-white/20 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 group">
+                  <CardContent className="p-6">
+                    <div className="flex flex-col items-center">
+                      <div className="w-14 h-14 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        <Calendar className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="text-3xl font-bold text-slate-800 mb-1">{stats.events}</div>
+                      <div className="text-sm text-slate-600 font-medium">Event</div>
+                      <div className="flex items-center text-green-600 text-xs mt-2">
+                        <ArrowUpRight className="w-3 h-3 mr-1" />
+                        +12% semester ini
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </div>
@@ -195,47 +227,54 @@ export default function Portfolio() {
         {/* Search and Filter Section */}
         <section className="pb-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Main Search Bar */}
+            {/* Main Search Card */}
             <Card className="mb-8 bg-white/80 backdrop-blur-xl border-white/20 shadow-2xl">
               <CardContent className="p-8">
                 <div className="flex flex-col lg:flex-row gap-6">
-                  {/* Search Input */}
+                  {/* Enhanced Search Input */}
                   <div className="flex-1 relative">
                     <Input
                       type="text"
                       placeholder="Cari UKM berdasarkan nama atau deskripsi..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-12 pr-4 h-14 text-lg bg-white/80 backdrop-blur-sm border-slate-200 focus:border-blue-400 focus:ring-blue-400 rounded-2xl shadow-lg"
+                      className="pl-14 pr-12 h-16 text-lg bg-white/90 backdrop-blur-sm border-slate-200 focus:border-blue-400 focus:ring-blue-400 rounded-2xl shadow-lg transition-all duration-300"
                     />
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-6 w-6" />
+                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+                      <Search className="text-white h-5 w-5" />
+                    </div>
                     {searchTerm && (
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 h-10 w-10 text-slate-400 hover:text-slate-600"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 h-12 w-12 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl"
                         onClick={() => setSearchTerm("")}
                       >
-                        <X className="h-4 w-4" />
+                        <X className="h-5 w-5" />
                       </Button>
                     )}
                   </div>
 
-                  {/* Quick Filters */}
-                  <div className="flex flex-wrap lg:flex-nowrap gap-3">
+                  {/* Enhanced Filter Controls */}
+                  <div className="flex flex-wrap lg:flex-nowrap gap-4">
                     <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                      <SelectTrigger className="w-full lg:w-48 h-14 bg-white/80 backdrop-blur-sm border-slate-200 rounded-2xl shadow-lg">
-                        <SelectValue placeholder="Kategori" />
+                      <SelectTrigger className="w-full lg:w-56 h-16 bg-white/90 backdrop-blur-sm border-slate-200 rounded-2xl shadow-lg text-base">
+                        <div className="flex items-center">
+                          <Filter className="w-5 h-5 mr-3 text-slate-500" />
+                          <SelectValue placeholder="Pilih Kategori" />
+                        </div>
                       </SelectTrigger>
-                      <SelectContent className="bg-white/95 backdrop-blur-xl border-white/20">
+                      <SelectContent className="bg-white/95 backdrop-blur-xl border-white/20 shadow-2xl">
                         {updatedCategories.map((category) => {
                           const IconComponent = category.icon
                           return (
-                            <SelectItem key={category.value} value={category.value}>
+                            <SelectItem key={category.value} value={category.value} className="py-3">
                               <div className="flex items-center">
-                                <IconComponent className="w-4 h-4 mr-2" />
-                                {category.label}
-                                <Badge variant="outline" className="ml-2 text-xs">
+                                <div className={`w-8 h-8 bg-gradient-to-r from-${category.color}-500 to-${category.color}-600 rounded-lg flex items-center justify-center mr-3`}>
+                                  <IconComponent className="w-4 h-4 text-white" />
+                                </div>
+                                <span className="font-medium">{category.label}</span>
+                                <Badge variant="outline" className="ml-auto text-xs">
                                   {category.count}
                                 </Badge>
                               </div>
@@ -246,57 +285,61 @@ export default function Portfolio() {
                     </Select>
 
                     <Select value={sortBy} onValueChange={setSortBy}>
-                      <SelectTrigger className="w-full lg:w-48 h-14 bg-white/80 backdrop-blur-sm border-slate-200 rounded-2xl shadow-lg">
-                        <SelectValue placeholder="Urutkan" />
+                      <SelectTrigger className="w-full lg:w-56 h-16 bg-white/90 backdrop-blur-sm border-slate-200 rounded-2xl shadow-lg text-base">
+                        <div className="flex items-center">
+                          <SlidersHorizontal className="w-5 h-5 mr-3 text-slate-500" />
+                          <SelectValue placeholder="Urutkan" />
+                        </div>
                       </SelectTrigger>
-                      <SelectContent className="bg-white/95 backdrop-blur-xl border-white/20">
-                        <SelectItem value="name">
+                      <SelectContent className="bg-white/95 backdrop-blur-xl border-white/20 shadow-2xl">
+                        <SelectItem value="name" className="py-3">
                           <div className="flex items-center">
-                            <ArrowUpDown className="w-4 h-4 mr-2" />
-                            Nama A-Z
+                            <ArrowUpDown className="w-4 h-4 mr-3" />
+                            <span className="font-medium">Nama A-Z</span>
                           </div>
                         </SelectItem>
-                        <SelectItem value="newest">
+                        <SelectItem value="newest" className="py-3">
                           <div className="flex items-center">
-                            <Calendar className="w-4 h-4 mr-2" />
-                            Terbaru
+                            <Calendar className="w-4 h-4 mr-3" />
+                            <span className="font-medium">Terbaru</span>
                           </div>
                         </SelectItem>
-                        <SelectItem value="oldest">
+                        <SelectItem value="oldest" className="py-3">
                           <div className="flex items-center">
-                            <Calendar className="w-4 h-4 mr-2" />
-                            Terlama
+                            <Clock className="w-4 h-4 mr-3" />
+                            <span className="font-medium">Terlama</span>
                           </div>
                         </SelectItem>
-                        <SelectItem value="popular">
+                        <SelectItem value="popular" className="py-3">
                           <div className="flex items-center">
-                            <TrendingUp className="w-4 h-4 mr-2" />
-                            Terpopuler
+                            <TrendingUp className="w-4 h-4 mr-3" />
+                            <span className="font-medium">Terpopuler</span>
                           </div>
                         </SelectItem>
                       </SelectContent>
                     </Select>
 
-                    <div className="flex gap-2">
+                    {/* View Mode Toggle */}
+                    <div className="flex gap-2 bg-slate-100 p-2 rounded-2xl">
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="icon"
-                        className={`h-14 w-14 rounded-2xl shadow-lg border-slate-200 ${
+                        className={`h-12 w-12 rounded-xl transition-all duration-300 ${
                           viewMode === "grid"
-                            ? "bg-blue-50 text-blue-600 border-blue-200"
-                            : "bg-white/80 backdrop-blur-sm"
+                            ? "bg-white text-blue-600 shadow-lg scale-105"
+                            : "text-slate-500 hover:text-slate-700"
                         }`}
                         onClick={() => setViewMode("grid")}
                       >
                         <Grid3X3 className="h-5 w-5" />
                       </Button>
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="icon"
-                        className={`h-14 w-14 rounded-2xl shadow-lg border-slate-200 ${
+                        className={`h-12 w-12 rounded-xl transition-all duration-300 ${
                           viewMode === "list"
-                            ? "bg-blue-50 text-blue-600 border-blue-200"
-                            : "bg-white/80 backdrop-blur-sm"
+                            ? "bg-white text-blue-600 shadow-lg scale-105"
+                            : "text-slate-500 hover:text-slate-700"
                         }`}
                         onClick={() => setViewMode("list")}
                       >
@@ -306,17 +349,23 @@ export default function Portfolio() {
                   </div>
                 </div>
 
-                {/* Active Filters */}
+                {/* Active Filters Display */}
                 {(searchTerm || categoryFilter !== "all" || sortBy !== "name") && (
-                  <div className="flex flex-wrap items-center gap-3 mt-6 pt-6 border-t border-slate-200">
-                    <span className="text-sm font-medium text-slate-600">Filter aktif:</span>
+                  <div className="flex flex-wrap items-center gap-3 mt-8 pt-6 border-t border-slate-200">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+                        <Filter className="w-3 h-3 text-white" />
+                      </div>
+                      <span className="text-sm font-semibold text-slate-700">Filter Aktif:</span>
+                    </div>
                     {searchTerm && (
-                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                        Pencarian: "{searchTerm}"
+                      <Badge className="bg-blue-100 text-blue-800 border-blue-200 px-4 py-2 rounded-xl">
+                        <Search className="w-3 h-3 mr-2" />
+                        "{searchTerm}"
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-4 w-4 ml-2 hover:bg-blue-100"
+                          className="h-5 w-5 ml-2 hover:bg-blue-200 rounded-lg"
                           onClick={() => setSearchTerm("")}
                         >
                           <X className="h-3 w-3" />
@@ -324,12 +373,13 @@ export default function Portfolio() {
                       </Badge>
                     )}
                     {categoryFilter !== "all" && (
-                      <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
-                        Kategori: {updatedCategories.find((c) => c.value === categoryFilter)?.label}
+                      <Badge className="bg-purple-100 text-purple-800 border-purple-200 px-4 py-2 rounded-xl">
+                        <Target className="w-3 h-3 mr-2" />
+                        {updatedCategories.find((c) => c.value === categoryFilter)?.label}
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-4 w-4 ml-2 hover:bg-purple-100"
+                          className="h-5 w-5 ml-2 hover:bg-purple-200 rounded-lg"
                           onClick={() => setCategoryFilter("all")}
                         >
                           <X className="h-3 w-3" />
@@ -337,12 +387,13 @@ export default function Portfolio() {
                       </Badge>
                     )}
                     {sortBy !== "name" && (
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                        Urutan: {sortBy === "newest" ? "Terbaru" : sortBy === "oldest" ? "Terlama" : "Terpopuler"}
+                      <Badge className="bg-green-100 text-green-800 border-green-200 px-4 py-2 rounded-xl">
+                        <ArrowUpDown className="w-3 h-3 mr-2" />
+                        {sortBy === "newest" ? "Terbaru" : sortBy === "oldest" ? "Terlama" : "Terpopuler"}
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-4 w-4 ml-2 hover:bg-green-100"
+                          className="h-5 w-5 ml-2 hover:bg-green-200 rounded-lg"
                           onClick={() => setSortBy("name")}
                         >
                           <X className="h-3 w-3" />
@@ -350,12 +401,12 @@ export default function Portfolio() {
                       </Badge>
                     )}
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
                       onClick={clearFilters}
-                      className="text-slate-500 hover:text-slate-700 hover:bg-slate-100"
+                      className="text-slate-600 hover:text-slate-800 hover:bg-slate-100 border-slate-200 rounded-xl px-4 py-2 bg-transparent"
                     >
-                      <X className="h-4 w-4 mr-1" />
+                      <X className="h-4 w-4 mr-2" />
                       Hapus Semua
                     </Button>
                   </div>
@@ -363,9 +414,9 @@ export default function Portfolio() {
               </CardContent>
             </Card>
 
-            {/* Category Pills */}
+            {/* Enhanced Category Pills */}
             <div className="mb-8">
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-4">
                 {updatedCategories.slice(0, 8).map((category) => {
                   const IconComponent = category.icon
                   const isActive = categoryFilter === category.value
@@ -374,18 +425,26 @@ export default function Portfolio() {
                       key={category.value}
                       variant={isActive ? "default" : "outline"}
                       onClick={() => setCategoryFilter(category.value)}
-                      className={`h-12 px-6 rounded-2xl shadow-lg transition-all duration-300 ${
+                      className={`h-14 px-6 rounded-2xl shadow-lg transition-all duration-300 group ${
                         isActive
-                          ? `bg-gradient-to-r from-${category.color}-500 to-${category.color}-600 text-white shadow-xl transform scale-105`
-                          : "bg-white/80 backdrop-blur-sm border-slate-200 text-slate-700 hover:bg-slate-50 hover:scale-105"
+                          ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-xl transform scale-105 hover:scale-110"
+                          : "bg-white/80 backdrop-blur-sm border-slate-200 text-slate-700 hover:bg-white hover:scale-105 hover:shadow-xl"
                       }`}
                     >
-                      <IconComponent className="w-4 h-4 mr-2" />
-                      {category.label}
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center mr-3 transition-all duration-300 ${
+                        isActive 
+                          ? "bg-white/20" 
+                          : "bg-gradient-to-r from-slate-500 to-slate-600 group-hover:from-blue-500 group-hover:to-purple-500"
+                      }`}>
+                        <IconComponent className={`w-4 h-4 ${isActive ? "text-white" : "text-white"}`} />
+                      </div>
+                      <span className="font-semibold">{category.label}</span>
                       <Badge
                         variant="outline"
-                        className={`ml-2 text-xs ${
-                          isActive ? "bg-white/20 text-white border-white/30" : "bg-slate-100 text-slate-600"
+                        className={`ml-3 text-xs transition-all duration-300 ${
+                          isActive 
+                            ? "bg-white/20 text-white border-white/30" 
+                            : "bg-slate-100 text-slate-600 group-hover:bg-blue-100 group-hover:text-blue-700"
                         }`}
                       >
                         {category.count}
@@ -396,36 +455,46 @@ export default function Portfolio() {
               </div>
             </div>
 
-            {/* Results Header */}
+            {/* Enhanced Results Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-              <div>
-                <h2 className="text-2xl font-bold text-slate-800 mb-2">
+              <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20">
+                <h2 className="text-2xl font-bold text-slate-800 mb-2 flex items-center">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mr-3">
+                    <Compass className="w-4 h-4 text-white" />
+                  </div>
                   {filteredAndSortedUKMs.length > 0 ? (
                     <>
-                      Menampilkan {filteredAndSortedUKMs.length} UKM
+                      {filteredAndSortedUKMs.length} UKM Ditemukan
                       {searchTerm && (
-                        <span className="text-blue-600"> untuk "{searchTerm}"</span>
+                        <span className="text-blue-600 ml-2">untuk "{searchTerm}"</span>
                       )}
                     </>
                   ) : (
                     "Tidak ada UKM ditemukan"
                   )}
                 </h2>
-                <p className="text-slate-600">
+                <div className="flex items-center gap-4 text-sm text-slate-600">
                   {categoryFilter !== "all" && (
-                    <>
-                      Kategori: {updatedCategories.find((c) => c.value === categoryFilter)?.label} •{" "}
-                    </>
+                    <div className="flex items-center">
+                      <Target className="w-4 h-4 mr-1" />
+                      {updatedCategories.find((c) => c.value === categoryFilter)?.label}
+                    </div>
                   )}
-                  Diurutkan berdasarkan{" "}
-                  {sortBy === "name"
-                    ? "nama"
-                    : sortBy === "newest"
-                      ? "terbaru"
-                      : sortBy === "oldest"
-                        ? "terlama"
-                        : "popularitas"}
-                </p>
+                  <div className="flex items-center">
+                    <ArrowUpDown className="w-4 h-4 mr-1" />
+                    {sortBy === "name"
+                      ? "Diurutkan A-Z"
+                      : sortBy === "newest"
+                        ? "Terbaru dulu"
+                        : sortBy === "oldest"
+                          ? "Terlama dulu"
+                          : "Terpopuler dulu"}
+                  </div>
+                  <div className="flex items-center">
+                    <MapPin className="w-4 h-4 mr-1" />
+                    Kampus Utama
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -435,12 +504,17 @@ export default function Portfolio() {
         <section className="pb-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {isLoading ? (
-              <div className="flex flex-col items-center justify-center py-20">
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-3xl flex items-center justify-center mb-6 shadow-2xl">
-                  <Loader2 className="h-8 w-8 animate-spin text-white" />
+              <div className="flex flex-col items-center justify-center py-24">
+                <div className="w-20 h-20 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 rounded-3xl flex items-center justify-center mb-8 shadow-2xl">
+                  <Loader2 className="h-10 w-10 animate-spin text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-800 mb-2">Memuat UKM...</h3>
-                <p className="text-slate-600">Sedang mengambil data terbaru untuk Anda</p>
+                <h3 className="text-2xl font-bold text-slate-800 mb-3">Memuat Portfolio UKM</h3>
+                <p className="text-lg text-slate-600 mb-6">Sedang mengambil data terbaru untuk Anda</p>
+                <div className="flex items-center gap-2 text-sm text-slate-500">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                </div>
               </div>
             ) : filteredAndSortedUKMs.length > 0 ? (
               <div
@@ -453,7 +527,7 @@ export default function Portfolio() {
                 {filteredAndSortedUKMs.map((ukm: any, index: number) => (
                   <div
                     key={ukm[0]}
-                    className="animate-in fade-in slide-in-from-bottom-4 duration-500"
+                    className="animate-in fade-in slide-in-from-bottom-4 duration-700"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     <UKMCard
@@ -471,20 +545,20 @@ export default function Portfolio() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-20">
-                <div className="w-32 h-32 bg-gradient-to-r from-slate-200 to-slate-300 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
+              <div className="text-center py-24">
+                <div className="w-32 h-32 bg-gradient-to-r from-slate-200 via-blue-200 to-purple-200 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl">
                   <Search className="h-16 w-16 text-slate-400" />
                 </div>
-                <h3 className="text-3xl font-bold text-slate-800 mb-4">Tidak ada UKM ditemukan</h3>
-                <p className="text-xl text-slate-600 mb-8 max-w-md mx-auto leading-relaxed">
+                <h3 className="text-4xl font-bold text-slate-800 mb-4">Tidak ada UKM ditemukan</h3>
+                <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto leading-relaxed">
                   {searchTerm
-                    ? `Tidak ada UKM yang cocok dengan pencarian "${searchTerm}"`
-                    : "Coba ubah filter atau kata kunci pencarian Anda"}
+                    ? `Maaf, tidak ada UKM yang cocok dengan pencarian "${searchTerm}". Coba gunakan kata kunci yang berbeda.`
+                    : "Coba ubah filter atau kata kunci pencarian Anda untuk menemukan UKM yang sesuai."}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button
                     onClick={clearFilters}
-                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 px-8 py-3"
+                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 px-8 py-4 text-lg rounded-2xl"
                   >
                     <Sparkles className="w-5 h-5 mr-2" />
                     Hapus Semua Filter
@@ -492,7 +566,7 @@ export default function Portfolio() {
                   <Button
                     variant="outline"
                     onClick={() => setSearchTerm("")}
-                    className="border-slate-200 text-slate-700 hover:bg-slate-50 bg-white/80 backdrop-blur-sm shadow-lg px-8 py-3"
+                    className="border-slate-200 text-slate-700 hover:bg-slate-50 bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl px-8 py-4 text-lg rounded-2xl transition-all duration-300"
                   >
                     <X className="w-5 h-5 mr-2" />
                     Reset Pencarian
