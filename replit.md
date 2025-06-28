@@ -100,6 +100,11 @@ A full-stack web application for managing and showcasing University Student Orga
 - June 28, 2025: Completed migration to standard Replit environment with all features working
 - June 28, 2025: Resolved Google Drive image loading by switching to thumbnail API format
 - June 28, 2025: Fixed member count display to show actual registrations from Google Sheets
+- June 28, 2025: Successfully migrated from Replit Agent to standard Replit environment
+- June 28, 2025: Enhanced admin panel with member management functionality
+- June 28, 2025: Added UKMMembersModal component to view and manage UKM members
+- June 28, 2025: Fixed admin UKM filtering to show only UKMs created by current admin
+- June 28, 2025: Improved admin statistics to display real data from Google Sheets
 
 ## Setup Instructions
 To connect the website with Google Sheets:

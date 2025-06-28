@@ -48,6 +48,7 @@ import { useUKMs, useDeleteUKM } from "@/hooks/use-ukm"
 import { useQuery } from "@tanstack/react-query"
 import UKMFormModal from "@/components/ukm/ukm-form-modal"
 import UKMDetailModal from "@/components/ukm/ukm-detail-modal"
+import UKMMembersModal from "@/components/ukm/ukm-members-modal"
 import type { UKM } from "@shared/schema"
 import { Link } from "wouter"
 import { getAllRegistrations } from "@/lib/api"
@@ -58,6 +59,8 @@ export default function Admin() {
   const [editingUKM, setEditingUKM] = useState<UKM | null>(null)
   const [deletingUKM, setDeletingUKM] = useState<UKM | null>(null)
   const [showUKMForm, setShowUKMForm] = useState(false)
+  const [showMembersModal, setShowMembersModal] = useState(false)
+  const [selectedUKMForMembers, setSelectedUKMForMembers] = useState<any>(null)
   const [searchTerm, setSearchTerm] = useState("")
 
   const { data: ukmsResponse, isLoading, refetch } = useUKMs()
@@ -73,8 +76,10 @@ export default function Admin() {
   const ukms = ukmsResponse?.success ? ukmsResponse.data || [] : []
   const registrations = registrationsResponse?.success ? registrationsResponse.data || [] : []
 
-  // Filter UKMs by current admin user
-  const adminUKMs = ukms.filter((ukm: any) => ukm[4] === user?.userId)
+  // Filter UKMs by current admin user - check both userId and email
+  const adminUKMs = ukms.filter((ukm: any) => 
+    ukm[4] === user?.userId || ukm[4] === user?.email
+  )
 
   // Filter UKMs based on search term AND admin ownership
   const filteredUKMs = adminUKMs.filter(
@@ -119,6 +124,11 @@ export default function Admin() {
   const handleFormSuccess = () => {
     setEditingUKM(null)
     refetch()
+  }
+
+  const handleViewMembers = (ukm: any) => {
+    setSelectedUKMForMembers(ukm)
+    setShowMembersModal(true)
   }
 
   if (!isAdmin) {
@@ -461,12 +471,17 @@ export default function Admin() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center">
-                            <Users className="w-4 h-4 text-slate-400 mr-2" />
-                            <span className="font-medium text-slate-700">
-                              {registrations.filter((reg: any) => reg[2] === ukm[0]).length}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="flex items-center gap-2 hover:bg-blue-50 text-blue-600 p-2 h-auto"
+                            onClick={() => handleViewMembers(ukm)}
+                          >
+                            <Users className="w-4 h-4" />
+                            <span className="font-medium">
+                              {registrations.filter((reg: any) => reg[2] === ukm[0]).length} anggota
                             </span>
-                          </div>
+                          </Button>
                         </TableCell>
                         <TableCell className="text-slate-700 font-medium">
                           {new Date().toLocaleDateString("id-ID", {
@@ -602,6 +617,13 @@ export default function Admin() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* UKM Members Modal */}
+      <UKMMembersModal
+        ukm={selectedUKMForMembers}
+        open={showMembersModal}
+        onOpenChange={setShowMembersModal}
+      />
     </div>
   )
 }
