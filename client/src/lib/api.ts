@@ -6,65 +6,32 @@ export async function apiCall<T = any>(data: any): Promise<ApiResponse<T>> {
   try {
     console.log('Making API call to Google Apps Script:', data);
     
-    // Try multiple approaches for Google Apps Script
-    const methods = [
-      // Method 1: Standard POST with JSON
-      async () => {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data),
-          mode: 'cors',
-        });
-        return response;
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8',
       },
-      // Method 2: GET with URL parameters for simpler cases
-      async () => {
-        const params = new URLSearchParams();
-        Object.keys(data).forEach(key => {
-          params.append(key, typeof data[key] === 'object' ? JSON.stringify(data[key]) : data[key]);
-        });
-        const response = await fetch(`${API_URL}?${params.toString()}`, {
-          method: 'GET',
-          mode: 'cors',
-        });
-        return response;
-      },
-      // Method 3: Form data approach
-      async () => {
-        const formData = new FormData();
-        Object.keys(data).forEach(key => {
-          formData.append(key, typeof data[key] === 'object' ? JSON.stringify(data[key]) : data[key]);
-        });
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          body: formData,
-          mode: 'cors',
-        });
-        return response;
-      }
-    ];
+      body: JSON.stringify(data),
+      mode: 'cors',
+      redirect: 'follow'
+    });
 
-    let lastError;
-    for (const method of methods) {
-      try {
-        const response = await method();
-        if (response.ok) {
-          const result = await response.json();
-          console.log('API response:', result);
-          return result;
-        } else {
-          console.warn(`Method failed with status: ${response.status}`);
-        }
-      } catch (error) {
-        lastError = error;
-        console.warn('Method failed:', error);
-      }
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    throw lastError || new Error('All connection methods failed');
+    const result = await response.json();
+    console.log('API response:', result);
+    
+    // Transform data for UKM read operations
+    if (result.success && data.sheet === 'UKM' && data.action === 'read' && Array.isArray(result.data)) {
+      return {
+        ...result,
+        data: transformUKMData(result.data)
+      };
+    }
+    
+    return result;
 
   } catch (error) {
     console.error('API call error:', error);
@@ -72,60 +39,52 @@ export async function apiCall<T = any>(data: any): Promise<ApiResponse<T>> {
     // Provide demo data for development
     console.log('Using demo data due to connection issues');
     
-    if (data.action === 'ukm' && data.method === 'read') {
+    if (data.sheet === 'UKM' && data.action === 'read') {
       return {
         success: true,
-        data: [
-          {
-            id_ukm: '1',
-            nama_ukm: 'Robotika',
-            deskripsi: 'Unit kegiatan mahasiswa yang berfokus pada pengembangan teknologi robotika dan automasi.',
-            gambar_url: 'https://via.placeholder.com/400x300/3B82F6/FFFFFF?text=Robotika',
-            prestasi: 'Juara 1 Kontes Robot Indonesia 2024'
-          },
-          {
-            id_ukm: '2',
-            nama_ukm: 'KSR PMI',
-            deskripsi: 'Korps Sukarela Palang Merah Indonesia yang bergerak di bidang kemanusiaan dan kesehatan.',
-            gambar_url: 'https://via.placeholder.com/400x300/EF4444/FFFFFF?text=KSR+PMI',
-            prestasi: 'Relawan Terbaik Provinsi 2024'
-          },
-          {
-            id_ukm: '3',
-            nama_ukm: 'Bahasa & Sastra',
-            deskripsi: 'Komunitas pecinta bahasa dan sastra Indonesia yang aktif dalam berbagai kegiatan literasi.',
-            gambar_url: 'https://via.placeholder.com/400x300/10B981/FFFFFF?text=Bahasa',
-            prestasi: 'Juara 2 Lomba Karya Tulis Nasional 2024'
-          }
-        ]
+        data: transformUKMData([
+          ['1', 'Robotika', 'https://via.placeholder.com/400x300/3B82F6/FFFFFF?text=Robotika', 'Unit kegiatan mahasiswa yang berfokus pada pengembangan teknologi robotika dan automasi.', 'admin@example.com', 'Juara 1 Kontes Robot Indonesia 2024'],
+          ['2', 'KSR PMI', 'https://via.placeholder.com/400x300/EF4444/FFFFFF?text=KSR+PMI', 'Korps Sukarela Palang Merah Indonesia yang bergerak di bidang kemanusiaan dan kesehatan.', 'admin@example.com', 'Relawan Terbaik Provinsi 2024'],
+          ['3', 'Bahasa & Sastra', 'https://via.placeholder.com/400x300/10B981/FFFFFF?text=Bahasa', 'Komunitas pecinta bahasa dan sastra Indonesia yang aktif dalam berbagai kegiatan literasi.', 'admin@example.com', 'Juara 2 Lomba Karya Tulis Nasional 2024']
+        ])
       };
     }
 
-    if (data.action === 'login') {
+    if (data.sheet === 'Users' && data.action === 'login') {
       // Demo login - accept any credentials
       return {
         success: true,
         data: {
-          userId: 'demo-user-123',
+          userId: data.email,
           namaMahasiswa: 'Demo User',
           email: data.email,
+          nomorWhatsapp: '081234567890',
+          nim: '12345678',
+          gender: 'Laki-laki',
+          jurusan: 'Teknik Informatika',
           role: 'user',
           createdAt: new Date().toISOString()
-        }
+        },
+        redirect: '/dashboard'
       };
     }
 
-    if (data.action === 'register') {
+    if (data.sheet === 'Users' && data.action === 'register') {
       // Demo register - accept any data
       return {
         success: true,
         data: {
-          userId: 'demo-user-' + Date.now(),
+          userId: data.email,
           namaMahasiswa: data.namaMahasiswa,
           email: data.email,
-          role: 'user',
+          nomorWhatsapp: data.nomorWhatsapp || '',
+          nim: data.nim || '',
+          gender: data.gender || '',
+          jurusan: data.jurusan || '',
+          role: data.role || 'user',
           createdAt: new Date().toISOString()
-        }
+        },
+        redirect: data.role === 'admin' ? '/admin' : '/dashboard'
       };
     }
     
@@ -139,6 +98,7 @@ export async function apiCall<T = any>(data: any): Promise<ApiResponse<T>> {
 // User authentication
 export async function loginUser(email: string, password: string) {
   return apiCall({
+    sheet: 'Users',
     action: 'login',
     email,
     password,
@@ -147,68 +107,122 @@ export async function loginUser(email: string, password: string) {
 
 export async function registerUser(userData: any) {
   return apiCall({
+    sheet: 'Users',
     action: 'register',
-    ...userData,
+    email: userData.email,
+    password: userData.password,
+    namaMahasiswa: userData.namaMahasiswa,
+    nomorWhatsapp: userData.nomorWhatsapp,
+    nim: userData.nim,
+    gender: userData.gender,
+    jurusan: userData.jurusan,
+    role: userData.role || 'user',
   });
+}
+
+// Transform array data from Google Sheets to objects
+function transformUKMData(data: any[]): any[] {
+  return data.map((row: any[]) => ({
+    id_ukm: row[0],
+    nama_ukm: row[1],
+    gambar_url: row[2],
+    deskripsi: row[3],
+    id_users: row[4],
+    prestasi: row[5]
+  }));
+}
+
+function transformUserData(userData: any[]): any {
+  return {
+    userId: userData[0],
+    namaMahasiswa: userData[1],
+    email: userData[3],
+    nomorWhatsapp: userData[4],
+    nim: userData[5],
+    gender: userData[6],
+    jurusan: userData[7],
+    role: userData[8]
+  };
 }
 
 // UKM operations
 export async function getUKMs(email: string = 'guest@example.com') {
   return apiCall({
+    sheet: 'UKM',
+    action: 'read',
     email,
-    action: 'ukm',
-    method: 'read',
   });
 }
 
 export async function createUKM(email: string, ukmData: any) {
   return apiCall({
+    sheet: 'UKM',
+    action: 'create',
     email,
-    action: 'ukm',
-    method: 'create',
-    ukmData: ukmData,
+    data: {
+      nama_ukm: ukmData.nama_ukm,
+      deskripsi: ukmData.deskripsi,
+      prestasi: ukmData.prestasi,
+      id_users: ukmData.id_users,
+      imageData: ukmData.imageData,
+      mimeType: ukmData.mimeType,
+      fileName: ukmData.fileName,
+    },
   });
 }
 
 export async function updateUKM(email: string, ukmId: string, ukmData: any) {
   return apiCall({
+    sheet: 'UKM',
+    action: 'update',
     email,
-    action: 'ukm',
-    method: 'update',
-    ukmId: ukmId,
-    ukmData: ukmData,
+    id_ukm: ukmId,
+    data: {
+      nama_ukm: ukmData.nama_ukm,
+      deskripsi: ukmData.deskripsi,
+      prestasi: ukmData.prestasi,
+      id_users: ukmData.id_users,
+      imageData: ukmData.imageData,
+      mimeType: ukmData.mimeType,
+      fileName: ukmData.fileName,
+    },
   });
 }
 
 export async function deleteUKM(email: string, ukmId: string) {
   return apiCall({
+    sheet: 'UKM',
+    action: 'delete',
     email,
-    action: 'ukm',
-    method: 'delete',
-    ukmId: ukmId,
+    id_ukm: ukmId,
   });
 }
 
 // UKM Registration operations
 export async function registerToUKM(email: string, ukmId: string) {
   return apiCall({
+    sheet: 'Daftar',
+    action: 'create',
     email,
-    action: 'register_ukm',
-    ukmId: ukmId,
+    data: {
+      id_ukm: ukmId,
+    },
   });
 }
 
 export async function getUserUKMs(email: string) {
   return apiCall({
+    sheet: 'Daftar',
+    action: 'read',
     email,
-    action: 'get_user_ukms',
   });
 }
 
 export async function unregisterFromUKM(email: string, ukmId: string) {
   return apiCall({
+    sheet: 'Daftar',
+    action: 'delete',
     email,
-    action: 'unregister_ukm',
-    ukmId: ukmId,
+    id_ukm: ukmId,
   });
 }

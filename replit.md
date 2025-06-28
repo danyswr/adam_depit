@@ -90,6 +90,9 @@ A full-stack web application for managing and showcasing University Student Orga
 - June 28, 2025: Fixed Google Sheets integration with updated schema and API structure
 - June 28, 2025: Updated user authentication to use proper field names (namaMahasiswa, nomorWhatsapp, role)
 - June 28, 2025: Created comprehensive Google Apps Script file for backend integration
+- June 28, 2025: Successfully migrated from Replit Agent to standard Replit environment
+- June 28, 2025: Fixed Google Apps Script connection - now receiving successful API responses
+- June 28, 2025: Updated API structure to match Google Apps Script requirements (sheet/action pattern)
 
 ## Setup Instructions
 To connect the website with Google Sheets:

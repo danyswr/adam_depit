@@ -1,76 +1,50 @@
+// ini kode.gs nya
 // COPY PASTE SEMUA KODE INI KE GOOGLE APPS SCRIPT ANDA
-// PASTIKAN UNTUK MENGGANTI FOLDER_ID SESUAI DENGAN FOLDER GOOGLE DRIVE ANDA
+// LALU JALANKAN FUNCTION fixExistingData() SEKALI SAJA
 
 // Konstanta
 const FOLDER_ID = "1ZoZ-i_aZUvNHVE_g3J0oNSrxZ02L23EP"; // Your Google Drive folder ID
 
-function doGet(e) {
-  return handleRequest(e);
-}
-
-function doPost(e) {
-  return handleRequest(e);
-}
-
-function handleRequest(e) {
+// FUNGSI UNTUK MEMPERBAIKI DATA EXISTING - JALANKAN SEKALI
+function fixExistingData() {
   try {
-    let data;
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const daftarSheet = ss.getSheetByName("Daftar");
+    const ukmSheet = ss.getSheetByName("UKM");
     
-    // Handle GET requests
-    if (e.parameter && Object.keys(e.parameter).length > 0) {
-      data = e.parameter;
-      // Parse JSON strings if they exist
-      for (const key in data) {
-        try {
-          if (data[key] && (data[key].startsWith('{') || data[key].startsWith('['))) {
-            data[key] = JSON.parse(data[key]);
-          }
-        } catch (parseError) {
-          // Keep as string if not valid JSON
+    if (!daftarSheet || !ukmSheet) {
+      console.log("Sheet tidak ditemukan");
+      return;
+    }
+    
+    const daftar = daftarSheet.getDataRange().getValues();
+    const ukms = ukmSheet.getDataRange().getValues();
+    
+    console.log(`Memperbaiki ${daftar.length - 1} pendaftaran...`);
+    
+    // Update semua pendaftaran existing
+    for (let i = 1; i < daftar.length; i++) {
+      const ukmId = daftar[i][2]; // id_ukm di kolom C
+      
+      // Cari nama UKM dari sheet UKM
+      for (let j = 1; j < ukms.length; j++) {
+        if (ukms[j][0] === ukmId) { // id_ukm match
+          const namaUkm = ukms[j][1]; // nama_ukm dari UKM
+          
+          // Update nama_ukm di sheet Daftar
+          daftarSheet.getRange(i + 1, 4).setValue(namaUkm);
+          daftarSheet.getRange(i + 1, 5).setValue(new Date().toISOString());
+          
+          console.log(`Row ${i + 1}: Updated nama_ukm to ${namaUkm}`);
+          break;
         }
       }
-    } 
-    // Handle POST requests
-    else if (e.postData && e.postData.contents) {
-      try {
-        data = JSON.parse(e.postData.contents);
-      } catch (parseError) {
-        data = e.parameter || {};
-      }
-    } 
-    else {
-      throw new Error('No data received');
     }
     
-    console.log('Received data:', data);
+    console.log("Perbaikan data selesai!");
     
-    const { action } = data;
-    
-    switch (action) {
-      case 'register':
-        return registerUser(data);
-      case 'login':
-        return loginUser(data);
-      case 'ukm':
-        return handleUKMCRUD(data);
-      case 'register_ukm':
-        return registerToUKM(data);
-      case 'unregister_ukm':
-        return unregisterFromUKM(data);
-      case 'get_user_ukms':
-        return getUserUKMs(data);
-      default:
-        return ContentService.createTextOutput(JSON.stringify({
-          success: false,
-          error: 'Invalid action'
-        })).setMimeType(ContentService.MimeType.JSON);
-    }
   } catch (error) {
-    console.error('doPost error:', error);
-    return ContentService.createTextOutput(JSON.stringify({
-      success: false,
-      error: error.message || 'Server error'
-    })).setMimeType(ContentService.MimeType.JSON);
+    console.error("Error:", error);
   }
 }
 
@@ -94,7 +68,7 @@ function getUserRole(email) {
   const data = sheet.getDataRange().getValues();
   if (data.length <= 1) return null;
   const user = data.slice(1).find(row => row[3] === email);
-  return user ? user[8] : 'user'; // Default to 'user' if role not found
+  return user ? user[8] : null;
 }
 
 function uploadImageToDrive(data) {
@@ -122,7 +96,7 @@ function getSheet(name) {
       
       if (name === "Users") {
         sheet.getRange(1, 1, 1, 9).setValues([[
-          "user_id", "nama_mahasiswa", "password", "email", 
+          "user_id", "nama_mahasiswa", "password", "email_student", 
           "nomor_whatsapp", "NIM", "gender", "jurusan", "role"
         ]]);
       } else if (name === "UKM") {
@@ -143,32 +117,39 @@ function getSheet(name) {
   }
 }
 
-function registerUser(data) {
+function registerUser(json) {
   try {
     const sheet = getSheet("Users");
     if (!sheet) throw new Error("Users sheet not found");
 
-    const { email, password, namaMahasiswa, nomorWhatsapp, nim, gender, jurusan, role } = data;
-    if (!email || !password || !namaMahasiswa) {
+    const { email, password, namaMahasiswa, nomorWhatsapp, nim, gender, jurusan, role } = json;
+    if (!email || !password || !namaMahasiswa || !role) {
       return ContentService.createTextOutput(JSON.stringify({ 
         success: false, 
-        error: "Email, password, dan nama lengkap wajib diisi" 
+        error: "Missing required fields" 
       })).setMimeType(ContentService.MimeType.JSON);
     }
 
     if (!isEmailUnique(email)) {
       return ContentService.createTextOutput(JSON.stringify({ 
         success: false, 
-        error: "Email sudah terdaftar" 
+        error: "Email already exists" 
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    if (role !== "user" && role !== "admin") {
+      return ContentService.createTextOutput(JSON.stringify({ 
+        success: false, 
+        error: "Role must be 'user' or 'admin'" 
       })).setMimeType(ContentService.MimeType.JSON);
     }
 
     const hashedPassword = hashPassword(password);
     const userId = email;
-    const userRole = role || (email.includes('admin') ? 'admin' : 'user');
+    const createdAt = new Date().toISOString();
     const row = [
       userId, namaMahasiswa, hashedPassword, email, 
-      nomorWhatsapp || "", nim || "", gender || "", jurusan || "", userRole
+      nomorWhatsapp || "", nim || "", gender || "", jurusan || "", role
     ];
     
     sheet.appendRow(row);
@@ -182,10 +163,10 @@ function registerUser(data) {
         nim: nim || "",
         gender: gender || "",
         jurusan: jurusan || "",
-        role: userRole,
-        createdAt: new Date().toISOString()
+        role: role,
+        createdAt: createdAt
       },
-      redirect: "/dashboard"
+      redirect: role === "user" ? "/user" : "/admin" 
     })).setMimeType(ContentService.MimeType.JSON);
   } catch (error) {
     console.error("Registration error:", error);
@@ -196,32 +177,32 @@ function registerUser(data) {
   }
 }
 
-function loginUser(data) {
+function loginUser(json) {
   try {
     const sheet = getSheet("Users");
     if (!sheet) throw new Error("Users sheet not found");
 
-    const { email, password } = data;
+    const { email, password } = json;
     if (!email || !password) {
       return ContentService.createTextOutput(JSON.stringify({ 
         success: false, 
-        error: "Email dan password wajib diisi" 
+        error: "Email and password are required" 
       })).setMimeType(ContentService.MimeType.JSON);
     }
 
-    const sheetData = sheet.getDataRange().getValues();
-    if (sheetData.length <= 1) {
+    const data = sheet.getDataRange().getValues();
+    if (data.length <= 1) {
       return ContentService.createTextOutput(JSON.stringify({ 
         success: false, 
-        error: "Email tidak ditemukan" 
+        error: "Email not found" 
       })).setMimeType(ContentService.MimeType.JSON);
     }
     
-    const user = sheetData.slice(1).find(row => row[3] === email);
+    const user = data.slice(1).find(row => row[3] === email);
     if (!user) {
       return ContentService.createTextOutput(JSON.stringify({ 
         success: false, 
-        error: "Email tidak ditemukan" 
+        error: "Email not found" 
       })).setMimeType(ContentService.MimeType.JSON);
     }
 
@@ -230,7 +211,7 @@ function loginUser(data) {
     if (storedHash !== inputHash) {
       return ContentService.createTextOutput(JSON.stringify({ 
         success: false, 
-        error: "Password salah" 
+        error: "Invalid password" 
       })).setMimeType(ContentService.MimeType.JSON);
     }
 
@@ -244,10 +225,10 @@ function loginUser(data) {
         nim: user[5],
         gender: user[6],
         jurusan: user[7],
-        role: user[8] || 'user',
-        createdAt: new Date().toISOString()
+        role: user[8],
+        createdAt: user[8] ? new Date().toISOString() : ""
       },
-      redirect: "/dashboard"
+      redirect: user[8] === "user" ? "/user" : "/admin" 
     })).setMimeType(ContentService.MimeType.JSON);
   } catch (error) {
     console.error("Login error:", error);
@@ -258,61 +239,62 @@ function loginUser(data) {
   }
 }
 
-function handleUKMCRUD(data) {
+function handleUKMCRUD(json) {
   try {
     const sheet = getSheet("UKM");
     if (!sheet) throw new Error("UKM sheet not found");
 
-    const { email, method, ukmData } = data;
-    if (!email) {
+    const { email, action, data } = json;
+    if (!email || !action) {
       return ContentService.createTextOutput(JSON.stringify({ 
         success: false, 
-        error: "Email wajib diisi" 
+        error: "Missing required fields" 
       })).setMimeType(ContentService.MimeType.JSON);
     }
 
     const role = getUserRole(email);
     
-    switch (method) {
+    switch (action) {
       case "create":
         if (role !== "admin") {
           return ContentService.createTextOutput(JSON.stringify({ 
             success: false, 
-            error: "Akses ditolak. Hanya admin yang dapat membuat UKM" 
+            error: "Access denied. Only admins can create UKM entries" 
           })).setMimeType(ContentService.MimeType.JSON);
         }
         
-        if (!ukmData) {
+        if (!data) {
           return ContentService.createTextOutput(JSON.stringify({ 
             success: false, 
-            error: "Data UKM wajib diisi" 
+            error: "UKM data is required" 
           })).setMimeType(ContentService.MimeType.JSON);
         }
         
         const ukmId = Utilities.getUuid();
         let imageUrl = "";
         
-        if (ukmData.imageData) {
+        if (data.imageData) {
           imageUrl = uploadImageToDrive({ 
-            imageData: ukmData.imageData, 
-            mimeType: ukmData.mimeType, 
-            fileName: ukmData.fileName 
+            imageData: data.imageData, 
+            mimeType: data.mimeType, 
+            fileName: data.fileName 
           });
         }
         
+        const createdAt = new Date().toISOString();
         const row = [
           ukmId, 
-          ukmData.nama_ukm || "", 
+          data.nama_ukm || "", 
           imageUrl, 
-          ukmData.deskripsi || "", 
-          ukmData.id_users || "", 
-          ukmData.prestasi || ""
+          data.deskripsi || "", 
+          data.id_users || "", 
+          data.prestasi || ""
         ];
         
         sheet.appendRow(row);
         return ContentService.createTextOutput(JSON.stringify({ 
           success: true, 
-          data: { id_ukm: ukmId }
+          id_ukm: ukmId 
         })).setMimeType(ContentService.MimeType.JSON);
         
       case "read":
@@ -333,30 +315,30 @@ function handleUKMCRUD(data) {
         if (role !== "admin") {
           return ContentService.createTextOutput(JSON.stringify({ 
             success: false, 
-            error: "Akses ditolak. Hanya admin yang dapat mengupdate UKM" 
+            error: "Access denied. Only admins can update UKM entries" 
           })).setMimeType(ContentService.MimeType.JSON);
         }
         
-        const updateIndex = findRowIndex(sheet, data.ukmId, 0);
+        const updateIndex = findRowIndex(sheet, json.id_ukm, 0);
         if (updateIndex !== -1) {
           const currentRow = sheet.getRange(updateIndex + 2, 1, 1, 6).getValues()[0];
           let newImageUrl = currentRow[2];
           
-          if (ukmData.imageData) {
+          if (data.imageData) {
             newImageUrl = uploadImageToDrive({ 
-              imageData: ukmData.imageData, 
-              mimeType: ukmData.mimeType, 
-              fileName: ukmData.fileName 
+              imageData: data.imageData, 
+              mimeType: data.mimeType, 
+              fileName: data.fileName 
             });
           }
           
           const updatedRow = [
-            data.ukmId || currentRow[0],
-            ukmData.nama_ukm !== undefined ? ukmData.nama_ukm : currentRow[1],
+            json.id_ukm || currentRow[0],
+            data.nama_ukm !== undefined ? data.nama_ukm : currentRow[1],
             newImageUrl,
-            ukmData.deskripsi !== undefined ? ukmData.deskripsi : currentRow[3],
-            ukmData.id_users !== undefined ? ukmData.id_users : currentRow[4],
-            ukmData.prestasi !== undefined ? ukmData.prestasi : currentRow[5]
+            data.deskripsi !== undefined ? data.deskripsi : currentRow[3],
+            data.id_users !== undefined ? data.id_users : currentRow[4],
+            data.prestasi !== undefined ? data.prestasi : currentRow[5]
           ];
           
           sheet.getRange(updateIndex + 2, 1, 1, updatedRow.length).setValues([updatedRow]);
@@ -367,18 +349,18 @@ function handleUKMCRUD(data) {
         
         return ContentService.createTextOutput(JSON.stringify({ 
           success: false, 
-          error: "UKM tidak ditemukan" 
+          error: "UKM not found" 
         })).setMimeType(ContentService.MimeType.JSON);
         
       case "delete":
         if (role !== "admin") {
           return ContentService.createTextOutput(JSON.stringify({ 
             success: false, 
-            error: "Akses ditolak. Hanya admin yang dapat menghapus UKM" 
+            error: "Access denied. Only admins can delete UKM entries" 
           })).setMimeType(ContentService.MimeType.JSON);
         }
         
-        const delIndex = findRowIndex(sheet, data.ukmId, 0);
+        const delIndex = findRowIndex(sheet, json.id_ukm, 0);
         if (delIndex !== -1) {
           sheet.deleteRow(delIndex + 2);
           return ContentService.createTextOutput(JSON.stringify({ 
@@ -388,13 +370,13 @@ function handleUKMCRUD(data) {
         
         return ContentService.createTextOutput(JSON.stringify({ 
           success: false, 
-          error: "UKM tidak ditemukan" 
+          error: "UKM not found" 
         })).setMimeType(ContentService.MimeType.JSON);
         
       default:
         return ContentService.createTextOutput(JSON.stringify({ 
           success: false, 
-          error: "Method tidak valid" 
+          error: "Invalid action" 
         })).setMimeType(ContentService.MimeType.JSON);
     }
   } catch (error) {
@@ -406,140 +388,105 @@ function handleUKMCRUD(data) {
   }
 }
 
-function registerToUKM(data) {
-  try {
-    const sheet = getSheet("Daftar");
-    if (!sheet) throw new Error("Daftar sheet not found");
-    
-    const ukmSheet = getSheet("UKM");
-    if (!ukmSheet) throw new Error("UKM sheet not found");
-
-    const { email, ukmId } = data;
-    if (!email || !ukmId) {
-      return ContentService.createTextOutput(JSON.stringify({ 
-        success: false, 
-        error: "Email dan UKM ID wajib diisi" 
-      })).setMimeType(ContentService.MimeType.JSON);
-    }
-
-    // Check if already registered
-    const daftarData = sheet.getDataRange().getValues();
-    const alreadyRegistered = daftarData.slice(1).some(row => 
-      row[1] === email && row[2] === ukmId
-    );
-    
-    if (alreadyRegistered) {
-      return ContentService.createTextOutput(JSON.stringify({ 
-        success: false, 
-        error: "Anda sudah terdaftar di UKM ini" 
-      })).setMimeType(ContentService.MimeType.JSON);
-    }
-
-    // Get UKM name
-    const ukmData = ukmSheet.getDataRange().getValues();
-    const ukm = ukmData.slice(1).find(row => row[0] === ukmId);
-    if (!ukm) {
-      return ContentService.createTextOutput(JSON.stringify({ 
-        success: false, 
-        error: "UKM tidak ditemukan" 
-      })).setMimeType(ContentService.MimeType.JSON);
-    }
-
-    const daftarId = Utilities.getUuid();
-    const row = [
-      daftarId,
-      email,
-      ukmId,
-      ukm[1], // nama_ukm
-      new Date().toISOString()
-    ];
-    
-    sheet.appendRow(row);
-    return ContentService.createTextOutput(JSON.stringify({ 
-      success: true,
-      data: { message: "Berhasil mendaftar ke UKM" }
-    })).setMimeType(ContentService.MimeType.JSON);
-  } catch (error) {
-    console.error("Register to UKM error:", error);
-    return ContentService.createTextOutput(JSON.stringify({ 
-      success: false, 
-      error: error.message 
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
-function unregisterFromUKM(data) {
+function handleDaftarCRUD(json) {
   try {
     const sheet = getSheet("Daftar");
     if (!sheet) throw new Error("Daftar sheet not found");
 
-    const { email, ukmId } = data;
-    if (!email || !ukmId) {
+    const { email, action, data } = json;
+    if (!email || !action) {
       return ContentService.createTextOutput(JSON.stringify({ 
         success: false, 
-        error: "Email dan UKM ID wajib diisi" 
+        error: "Missing required fields" 
       })).setMimeType(ContentService.MimeType.JSON);
     }
 
-    const daftarData = sheet.getDataRange().getValues();
-    for (let i = 1; i < daftarData.length; i++) {
-      if (daftarData[i][1] === email && daftarData[i][2] === ukmId) {
-        sheet.deleteRow(i + 1);
-        return ContentService.createTextOutput(JSON.stringify({ 
-          success: true,
-          data: { message: "Berhasil keluar dari UKM" }
-        })).setMimeType(ContentService.MimeType.JSON);
-      }
-    }
-
-    return ContentService.createTextOutput(JSON.stringify({ 
-      success: false, 
-      error: "Pendaftaran tidak ditemukan" 
-    })).setMimeType(ContentService.MimeType.JSON);
-  } catch (error) {
-    console.error("Unregister from UKM error:", error);
-    return ContentService.createTextOutput(JSON.stringify({ 
-      success: false, 
-      error: error.message 
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
-function getUserUKMs(data) {
-  try {
-    const daftarSheet = getSheet("Daftar");
-    const ukmSheet = getSheet("UKM");
-    if (!daftarSheet || !ukmSheet) throw new Error("Required sheets not found");
-
-    const { email } = data;
-    if (!email) {
-      return ContentService.createTextOutput(JSON.stringify({ 
-        success: false, 
-        error: "Email wajib diisi" 
-      })).setMimeType(ContentService.MimeType.JSON);
-    }
-
-    const daftarData = daftarSheet.getDataRange().getValues();
-    const ukmData = ukmSheet.getDataRange().getValues();
+    const role = getUserRole(email);
     
-    const userUKMs = [];
-    
-    for (let i = 1; i < daftarData.length; i++) {
-      if (daftarData[i][1] === email) {
-        const ukmId = daftarData[i][2];
-        const ukm = ukmData.slice(1).find(row => row[0] === ukmId);
-        if (ukm) {
-          userUKMs.push(ukm);
+    switch (action) {
+      case "create":
+        if (role !== "user") {
+          return ContentService.createTextOutput(JSON.stringify({ 
+            success: false, 
+            error: "Access denied. Only users can register for UKM" 
+          })).setMimeType(ContentService.MimeType.JSON);
         }
-      }
-    }
+        
+        if (!data) {
+          return ContentService.createTextOutput(JSON.stringify({ 
+            success: false, 
+            error: "Registration data is required" 
+          })).setMimeType(ContentService.MimeType.JSON);
+        }
+        
+        // Dapatkan nama UKM dari sheet UKM
+        const namaUkm = getNamaUkmById(data.id_ukm);
+        if (!namaUkm) {
+          return ContentService.createTextOutput(JSON.stringify({ 
+            success: false, 
+            error: "UKM not found" 
+          })).setMimeType(ContentService.MimeType.JSON);
+        }
+        
+        const daftarId = Utilities.getUuid();
+        const createdAt = new Date().toISOString();
+        const row = [
+          daftarId, 
+          email, // id_user
+          data.id_ukm || "", 
+          namaUkm, 
+          createdAt
+        ];
+        
+        sheet.appendRow(row);
+        return ContentService.createTextOutput(JSON.stringify({ 
+          success: true, 
+          id_daftar: daftarId 
+        })).setMimeType(ContentService.MimeType.JSON);
+        
+      case "read":
+        const allDaftar = sheet.getDataRange().getValues();
+        if (allDaftar.length <= 1) {
+          return ContentService.createTextOutput(JSON.stringify({ 
+            success: true, 
+            data: [] 
+          })).setMimeType(ContentService.MimeType.JSON);
+        }
+        
+        return ContentService.createTextOutput(JSON.stringify({ 
+          success: true, 
+          data: allDaftar.slice(1)
+        })).setMimeType(ContentService.MimeType.JSON);
 
-    return ContentService.createTextOutput(JSON.stringify({ 
-      success: true, 
-      data: userUKMs
-    })).setMimeType(ContentService.MimeType.JSON);
+      case "delete":
+        if (role !== "admin") {
+          return ContentService.createTextOutput(JSON.stringify({ 
+            success: false, 
+            error: "Access denied. Only admins can delete registrations" 
+          })).setMimeType(ContentService.MimeType.JSON);
+        }
+        
+        const delIndex = findRowIndex(sheet, json.id_daftar, 0);
+        if (delIndex !== -1) {
+          sheet.deleteRow(delIndex + 2);
+          return ContentService.createTextOutput(JSON.stringify({ 
+            success: true 
+          })).setMimeType(ContentService.MimeType.JSON);
+        }
+        
+        return ContentService.createTextOutput(JSON.stringify({ 
+          success: false, 
+          error: "Registration not found" 
+        })).setMimeType(ContentService.MimeType.JSON);
+        
+      default:
+        return ContentService.createTextOutput(JSON.stringify({ 
+          success: false, 
+          error: "Invalid action" 
+        })).setMimeType(ContentService.MimeType.JSON);
+    }
   } catch (error) {
-    console.error("Get user UKMs error:", error);
+    console.error("Daftar CRUD error:", error);
     return ContentService.createTextOutput(JSON.stringify({ 
       success: false, 
       error: error.message 
@@ -547,21 +494,81 @@ function getUserUKMs(data) {
   }
 }
 
-function findRowIndex(sheet, searchValue, columnIndex) {
+function getNamaUkmById(ukmId) {
+  const sheet = getSheet("UKM");
+  if (!sheet) return null;
   const data = sheet.getDataRange().getValues();
-  for (let i = 1; i < data.length; i++) {
-    if (data[i][columnIndex] === searchValue) {
-      return i - 1; // Return 0-based index
-    }
-  }
-  return -1;
+  if (data.length <= 1) return null;
+  const ukm = data.slice(1).find(row => row[0] === ukmId);
+  return ukm ? ukm[1] : null; // nama_ukm di kolom B
 }
 
-// Helper function untuk testing
-function testConnection() {
-  return ContentService.createTextOutput(JSON.stringify({
-    success: true,
-    message: "Google Apps Script is working!",
-    timestamp: new Date().toISOString()
-  })).setMimeType(ContentService.MimeType.JSON);
+function findRowIndex(sheet, value, column) {
+  try {
+    const data = sheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][column] === value) {
+        return i - 1;
+      }
+    }
+    return -1;
+  } catch (error) {
+    console.error("Error finding row index:", error);
+    return -1;
+  }
+}
+
+function doPost(e) {
+  try {
+    // Debug: Log the incoming request
+    console.log("doPost called");
+    console.log("Request body:", e.postData);
+    
+    // Handle case where postData is undefined or null
+    if (!e.postData || !e.postData.contents) {
+      console.log("No postData or contents found");
+      return ContentService.createTextOutput(JSON.stringify({ 
+        success: false, 
+        error: "No data received" 
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    const json = JSON.parse(e.postData.contents);
+    console.log("Parsed JSON:", json);
+    
+    const { sheet, action } = json;
+    
+    if (!sheet || !action) {
+      return ContentService.createTextOutput(JSON.stringify({ 
+        success: false, 
+        error: "Sheet and action are required" 
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    switch (sheet) {
+      case "Users":
+        if (action === "register") return registerUser(json);
+        if (action === "login") return loginUser(json);
+        break;
+      case "UKM":
+        return handleUKMCRUD(json);
+      case "Daftar":
+        return handleDaftarCRUD(json);
+    }
+    
+    return ContentService.createTextOutput(JSON.stringify({ 
+      success: false, 
+      error: "Invalid request" 
+    })).setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    console.error("doPost error:", error);
+    return ContentService.createTextOutput(JSON.stringify({ 
+      success: false, 
+      error: error.message 
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  return HtmlService.createHtmlOutput("Web App is running. Use POST for operations.");
 }
