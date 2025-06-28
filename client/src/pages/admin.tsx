@@ -77,9 +77,15 @@ export default function Admin() {
   const registrations = registrationsResponse?.success ? registrationsResponse.data || [] : []
 
   // Filter UKMs by current admin user - check both userId and email
-  const adminUKMs = ukms.filter((ukm: any) => 
-    ukm[4] === user?.userId || ukm[4] === user?.email
-  )
+  // If id_users is empty, show all UKMs for now (will fix with proper data)
+  const adminUKMs = ukms.filter((ukm: any) => {
+    // If id_users is empty or null, temporarily show for all admins
+    // This will be fixed when UKMs are created with proper user IDs
+    if (!ukm[4] || ukm[4] === "") {
+      return true; // Show UKMs with empty id_users for now
+    }
+    return ukm[4] === user?.userId || ukm[4] === user?.email
+  })
 
   // Filter UKMs based on search term AND admin ownership
   const filteredUKMs = adminUKMs.filter(

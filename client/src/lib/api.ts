@@ -160,7 +160,7 @@ export async function createUKM(email: string, ukmData: any) {
       nama_ukm: ukmData.nama_ukm,
       deskripsi: ukmData.deskripsi,
       prestasi: ukmData.prestasi,
-      id_users: ukmData.id_users,
+      id_users: email, // Use admin email as the creator
       imageData: ukmData.imageData,
       mimeType: ukmData.mimeType,
       fileName: ukmData.fileName,
