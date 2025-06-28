@@ -114,12 +114,12 @@ export default function Portfolio() {
     const filtered = ukms.filter((ukm: any) => {
       const matchesSearch =
         !searchTerm ||
-        ukm[1]?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ukm[3]?.toLowerCase().includes(searchTerm.toLowerCase());
+        ukm.nama_ukm?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ukm.deskripsi?.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesCategory =
         categoryFilter === "all" ||
-        getCategoryFromName(ukm[1]).includes(categoryFilter);
+        getCategoryFromName(ukm.nama_ukm).includes(categoryFilter);
 
       return matchesSearch && matchesCategory;
     });
@@ -128,11 +128,12 @@ export default function Portfolio() {
     filtered.sort((a: any, b: any) => {
       switch (sortBy) {
         case "name":
-          return a[1].localeCompare(b[1]);
+          return (a.nama_ukm || "").localeCompare(b.nama_ukm || "");
         case "newest":
-          return new Date(b[4]).getTime() - new Date(a[4]).getTime();
+          // Since we don't have creation date, sort by ID (newer IDs are typically created later)
+          return b.id_ukm.localeCompare(a.id_ukm);
         case "oldest":
-          return new Date(a[4]).getTime() - new Date(b[4]).getTime();
+          return a.id_ukm.localeCompare(b.id_ukm);
         case "popular":
           return Math.random() - 0.5; // Random for demo
         default:
@@ -183,7 +184,7 @@ export default function Portfolio() {
       cat.value === "all"
         ? ukms.length
         : ukms.filter((ukm: any) =>
-            getCategoryFromName(ukm[1]).includes(cat.value),
+            getCategoryFromName(ukm.nama_ukm).includes(cat.value),
           ).length,
   }));
 
@@ -665,19 +666,12 @@ export default function Portfolio() {
               >
                 {filteredAndSortedUKMs.map((ukm: any, index: number) => (
                   <div
-                    key={ukm[0]}
+                    key={ukm.id_ukm}
                     className="animate-in fade-in slide-in-from-bottom-4 duration-700"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     <UKMCard
-                      ukm={{
-                        id_ukm: ukm[0],
-                        nama_ukm: ukm[1],
-                        gambar_url: ukm[2],
-                        deskripsi: ukm[3],
-                        id_users: ukm[4],
-                        prestasi: ukm[5],
-                      }}
+                      ukm={ukm}
                       onViewDetail={setSelectedUKM}
                     />
                   </div>
