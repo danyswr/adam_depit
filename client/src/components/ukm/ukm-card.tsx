@@ -19,6 +19,9 @@ export default function UKMCard({ ukm, onViewDetail, showActions = false, onEdit
 
   // Use uploaded image URL if available, otherwise use default
   const imageUrl = ukm.gambar_url && ukm.gambar_url.trim() !== "" ? ukm.gambar_url : defaultImage;
+  
+  // Debug log to check the image URL
+  console.log('UKM Image URL for', ukm.nama_ukm, ':', imageUrl);
 
   return (
     <Card className="overflow-hidden hover-scale transition-all duration-300 border border-gray-100 bg-white">
