@@ -93,6 +93,9 @@ A full-stack web application for managing and showcasing University Student Orga
 - June 28, 2025: Successfully migrated from Replit Agent to standard Replit environment
 - June 28, 2025: Fixed Google Apps Script connection - now receiving successful API responses
 - June 28, 2025: Updated API structure to match Google Apps Script requirements (sheet/action pattern)
+- June 28, 2025: Implemented role-based routing and access control system
+- June 28, 2025: Fixed dashboard statistics to show real data instead of demo values
+- June 28, 2025: Added admin restriction to only access UKMs they created
 
 ## Setup Instructions
 To connect the website with Google Sheets:

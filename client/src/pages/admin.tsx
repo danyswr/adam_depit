@@ -26,19 +26,22 @@ export default function Admin() {
 
   const ukms = ukmsResponse?.success ? ukmsResponse.data || [] : [];
 
-  // Filter UKMs based on search term
-  const filteredUKMs = ukms.filter((ukm: any) => 
+  // Filter UKMs by current admin user
+  const adminUKMs = ukms.filter((ukm: any) => ukm[4] === user?.userId); // id_users at index 4
+
+  // Filter UKMs based on search term AND admin ownership
+  const filteredUKMs = adminUKMs.filter((ukm: any) => 
     !searchTerm || 
     ukm[1]?.toLowerCase().includes(searchTerm.toLowerCase()) || // nama_ukm
     ukm[3]?.toLowerCase().includes(searchTerm.toLowerCase())    // deskripsi
   );
-
-  // Mock admin stats - in real app this would come from API
+  
+  // Real admin stats from actual data
   const adminStats = {
-    totalUKM: ukms.length,
-    totalMembers: 2450,
-    newRegistrations: 15,
-    dailyActivity: 127,
+    totalUKM: adminUKMs.length,
+    totalMembers: 0, // Will be calculated from registrations when available
+    newRegistrations: 0, // Will be calculated from recent registrations
+    dailyActivity: 0, // Will be calculated from activity data
   };
 
   const handleDeleteUKM = async () => {
@@ -234,8 +237,8 @@ export default function Admin() {
                                 nama_ukm: ukm[1],
                                 gambar_url: ukm[2],
                                 deskripsi: ukm[3],
-                                created_at: ukm[4],
-                                updated_at: ukm[5],
+                                id_users: ukm[4],
+                                prestasi: ukm[5],
                               })}
                             >
                               <Search className="h-3 w-3" />
@@ -248,8 +251,8 @@ export default function Admin() {
                                 nama_ukm: ukm[1],
                                 gambar_url: ukm[2],
                                 deskripsi: ukm[3],
-                                created_at: ukm[4],
-                                updated_at: ukm[5],
+                                id_users: ukm[4],
+                                prestasi: ukm[5],
                               })}
                             >
                               <Edit className="h-3 w-3" />
@@ -262,8 +265,8 @@ export default function Admin() {
                                 nama_ukm: ukm[1],
                                 gambar_url: ukm[2],
                                 deskripsi: ukm[3],
-                                created_at: ukm[4],
-                                updated_at: ukm[5],
+                                id_users: ukm[4],
+                                prestasi: ukm[5],
                               })}
                             >
                               <Trash2 className="h-3 w-3" />

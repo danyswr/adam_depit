@@ -54,7 +54,12 @@ export default function RegisterModal({ open, onOpenChange }: RegisterModalProps
     if (result.success) {
       onOpenChange(false);
       form.reset();
-      setLocation("/dashboard");
+      // Redirect based on user role
+      if (result.data && result.data.role === 'admin') {
+        setLocation("/admin");
+      } else {
+        setLocation("/dashboard");
+      }
     }
   };
 
