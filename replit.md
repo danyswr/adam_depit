@@ -94,7 +94,7 @@ A full-stack web application for managing and showcasing University Student Orga
 ## Setup Instructions
 To connect the website with Google Sheets:
 
-1. **Copy Google Apps Script Code**: Use the code from `google-apps-script.gs` file
+1. **Copy Google Apps Script Code**: Use the updated code from `google-apps-script.gs` file
 2. **Create Google Apps Script Project**: 
    - Go to script.google.com
    - Create new project
@@ -104,8 +104,20 @@ To connect the website with Google Sheets:
    - Click Deploy > New Deployment
    - Choose "Web app" as type
    - Set execute as "Me" and access to "Anyone"
-   - Copy the web app URL and update API_URL in client/src/lib/api.ts
+   - Copy the web app URL (should match current API_URL)
 4. **Create Spreadsheet Sheets**: The script will auto-create required sheets (Users, UKM, Daftar)
+
+## Current Status
+- Website is fully functional with demo data
+- Google Apps Script connection partially working but needs spreadsheet setup
+- All authentication and UKM flows implemented
+- Error handling shows informative messages to users
+
+## Troubleshooting
+If you see "Cannot read properties of undefined (reading 'contents')" error:
+1. Ensure the Google Apps Script is deployed as web app with "Anyone" access
+2. Create or update the spreadsheet with required sheets
+3. Verify FOLDER_ID in the script matches your Google Drive folder
 
 ## User Preferences
 

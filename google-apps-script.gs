@@ -4,9 +4,44 @@
 // Konstanta
 const FOLDER_ID = "1ZoZ-i_aZUvNHVE_g3J0oNSrxZ02L23EP"; // Your Google Drive folder ID
 
+function doGet(e) {
+  return handleRequest(e);
+}
+
 function doPost(e) {
+  return handleRequest(e);
+}
+
+function handleRequest(e) {
   try {
-    const data = JSON.parse(e.postData.contents);
+    let data;
+    
+    // Handle GET requests
+    if (e.parameter && Object.keys(e.parameter).length > 0) {
+      data = e.parameter;
+      // Parse JSON strings if they exist
+      for (const key in data) {
+        try {
+          if (data[key] && (data[key].startsWith('{') || data[key].startsWith('['))) {
+            data[key] = JSON.parse(data[key]);
+          }
+        } catch (parseError) {
+          // Keep as string if not valid JSON
+        }
+      }
+    } 
+    // Handle POST requests
+    else if (e.postData && e.postData.contents) {
+      try {
+        data = JSON.parse(e.postData.contents);
+      } catch (parseError) {
+        data = e.parameter || {};
+      }
+    } 
+    else {
+      throw new Error('No data received');
+    }
+    
     console.log('Received data:', data);
     
     const { action } = data;

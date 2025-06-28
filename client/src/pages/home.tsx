@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import UKMCard from "@/components/ukm/ukm-card";
 import UKMDetailModal from "@/components/ukm/ukm-detail-modal";
 import LoginModal from "@/components/auth/login-modal";
@@ -8,7 +9,7 @@ import RegisterModal from "@/components/auth/register-modal";
 import { UKM } from "@shared/schema";
 import { useUKMs } from "@/hooks/use-ukm";
 import { useAuth } from "@/lib/auth";
-import { Users, Calendar, TrendingUp, Award } from "lucide-react";
+import { Users, Calendar, TrendingUp, Award, Info } from "lucide-react";
 
 export default function Home() {
   const [selectedUKM, setSelectedUKM] = useState<UKM | null>(null);
@@ -18,6 +19,7 @@ export default function Home() {
   const { data: ukmsResponse } = useUKMs();
 
   const ukms = ukmsResponse?.success ? ukmsResponse.data?.slice(0, 3) || [] : [];
+  const showDemoAlert = !ukmsResponse?.success;
 
   const handleJoinUKM = (ukm: UKM) => {
     if (!isLoggedIn) {
@@ -80,6 +82,16 @@ export default function Home() {
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Bergabunglah dengan komunitas mahasiswa yang aktif dan berprestasi
             </p>
+            
+            {showDemoAlert && (
+              <Alert className="max-w-2xl mx-auto mt-6">
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  Sedang menggunakan data demo. Untuk data real, pastikan Google Apps Script sudah di-deploy dengan benar.
+                  Error dari server: "{ukmsResponse?.error}"
+                </AlertDescription>
+              </Alert>
+            )}
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
