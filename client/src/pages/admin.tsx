@@ -74,24 +74,9 @@ export default function Admin() {
     enabled: !!user?.email,
   })
 
-  // Transform array data to object format like in UKM card
-  const rawUkms = ukmsResponse?.success ? ukmsResponse.data || [] : []
+  // Get UKM data (already transformed to object format by getUKMs)
+  const ukms = ukmsResponse?.success ? ukmsResponse.data || [] : []
   const registrations = registrationsResponse?.success ? registrationsResponse.data || [] : []
-
-  const ukms = rawUkms.map((row: any[]) => ({
-    id_ukm: row[0],
-    nama_ukm: row[1],
-    gambar_url: row[2],
-    deskripsi: row[3],
-    id_users: row[4],
-    prestasi: row[5]
-  }));
-
-  // Debug logging
-  console.log("Raw UKMs data:", rawUkms);
-  console.log("Transformed UKMs:", ukms);
-  console.log("Admin UKMs:", adminUKMs);
-  console.log("Filtered UKMs:", filteredUKMs);
 
   // Filter UKMs by current admin user - check both userId and email
   // If id_users is empty, show all UKMs for now (will fix with proper data)
@@ -110,6 +95,12 @@ export default function Admin() {
       ukm.nama_ukm?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       ukm.deskripsi?.toLowerCase().includes(searchTerm.toLowerCase()),
   )
+
+  // Debug logging
+  console.log("Raw UKMs data:", rawUkms);
+  console.log("Transformed UKMs:", ukms);
+  console.log("Admin UKMs:", adminUKMs);
+  console.log("Filtered UKMs:", filteredUKMs);
 
   // Calculate real admin stats from actual data
   const adminUKMIds = adminUKMs.map((ukm: any) => ukm.id_ukm)

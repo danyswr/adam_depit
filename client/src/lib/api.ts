@@ -160,11 +160,21 @@ function transformUserData(userData: any[]): any {
 
 // UKM operations
 export async function getUKMs(email: string = 'guest@example.com') {
-  return apiCall({
+  const response = await apiCall({
     sheet: 'UKM',
     action: 'read',
     email,
   });
+  
+  // Transform array data to object format for easier use
+  if (response.success && response.data) {
+    return {
+      success: true,
+      data: transformUKMData(response.data)
+    };
+  }
+  
+  return response;
 }
 
 export async function createUKM(email: string, ukmData: any) {
