@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -58,8 +58,25 @@ export default function UKMFormModal({
     defaultValues: {
       nama_ukm: ukm?.nama_ukm || "",
       deskripsi: ukm?.deskripsi || "",
+      prestasi: ukm?.prestasi || "",
     },
   });
+
+  // Set preview image when editing existing UKM
+  useEffect(() => {
+    if (isEditing && ukm?.gambar_url) {
+      setPreviewImage(ukm.gambar_url);
+    } else {
+      setPreviewImage(null);
+    }
+    
+    // Reset form values when ukm changes
+    form.reset({
+      nama_ukm: ukm?.nama_ukm || "",
+      deskripsi: ukm?.deskripsi || "",
+      prestasi: ukm?.prestasi || "",
+    });
+  }, [ukm, isEditing, form]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -247,6 +264,34 @@ export default function UKMFormModal({
                 <div className="flex items-center text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200">
                   <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0" />
                   {form.formState.errors.deskripsi.message}
+                </div>
+              )}
+            </div>
+
+            {/* Prestasi */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="prestasi"
+                className="text-amber-800 font-semibold flex items-center text-sm"
+              >
+                <Target className="w-4 h-4 mr-2" />
+                Prestasi
+              </Label>
+              <div className="relative">
+                <Textarea
+                  id="prestasi"
+                  rows={3}
+                  placeholder="Jelaskan prestasi yang pernah diraih UKM ini (opsional)..."
+                  {...form.register("prestasi")}
+                  disabled={isPending}
+                  className="pl-10 pt-3 border-amber-200 focus:border-amber-400 focus:ring-amber-400 bg-white/80 backdrop-blur-sm transition-all duration-200 resize-none"
+                />
+                <Target className="absolute left-3 top-3 w-4 h-4 text-amber-500" />
+              </div>
+              {form.formState.errors.prestasi && (
+                <div className="flex items-center text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200">
+                  <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0" />
+                  {form.formState.errors.prestasi.message}
                 </div>
               )}
             </div>
