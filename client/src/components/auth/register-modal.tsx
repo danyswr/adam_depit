@@ -37,10 +37,10 @@ export default function RegisterModal({ open, onOpenChange }: RegisterModalProps
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
     defaultValues: {
-      nama_mahasiswa: "",
+      namaMahasiswa: "",
       email: "",
       nim: "",
-      nomor_whatsapp: "",
+      nomorWhatsapp: "",
       gender: "",
       jurusan: "",
       password: "",
@@ -68,15 +68,15 @@ export default function RegisterModal({ open, onOpenChange }: RegisterModalProps
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="nama_mahasiswa">Nama Lengkap *</Label>
+              <Label htmlFor="namaMahasiswa">Nama Lengkap *</Label>
               <Input
-                id="nama_mahasiswa"
+                id="namaMahasiswa"
                 placeholder="Nama lengkap"
-                {...form.register("nama_mahasiswa")}
+                {...form.register("namaMahasiswa")}
                 disabled={registerMutation.isPending}
               />
-              {form.formState.errors.nama_mahasiswa && (
-                <p className="text-sm text-destructive">{form.formState.errors.nama_mahasiswa.message}</p>
+              {form.formState.errors.namaMahasiswa && (
+                <p className="text-sm text-destructive">{form.formState.errors.namaMahasiswa.message}</p>
               )}
             </div>
 
@@ -110,16 +110,16 @@ export default function RegisterModal({ open, onOpenChange }: RegisterModalProps
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="nomor_whatsapp">No. WhatsApp</Label>
+              <Label htmlFor="nomorWhatsapp">No. WhatsApp</Label>
               <Input
-                id="nomor_whatsapp"
+                id="nomorWhatsapp"
                 type="tel"
                 placeholder="08xxxxxxxxxx"
-                {...form.register("nomor_whatsapp")}
+                {...form.register("nomorWhatsapp")}
                 disabled={registerMutation.isPending}
               />
-              {form.formState.errors.nomor_whatsapp && (
-                <p className="text-sm text-destructive">{form.formState.errors.nomor_whatsapp.message}</p>
+              {form.formState.errors.nomorWhatsapp && (
+                <p className="text-sm text-destructive">{form.formState.errors.nomorWhatsapp.message}</p>
               )}
             </div>
           </div>

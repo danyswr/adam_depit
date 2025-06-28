@@ -19,7 +19,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
 
   const isLoggedIn = !!user;
-  const isAdmin = user?.jurusan === 'admin';
+  const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
     // Load user from localStorage on mount

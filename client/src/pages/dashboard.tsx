@@ -52,13 +52,13 @@ export default function Dashboard() {
                 <div className="flex items-center space-x-4">
                   <Avatar className="h-16 w-16">
                     <AvatarFallback className="text-lg">
-                      {user.nama_mahasiswa.substring(0, 2).toUpperCase()}
+                      {user.namaMahasiswa.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
                     <p className="text-gray-600">
-                      Selamat datang, <span className="font-semibold">{user.nama_mahasiswa}</span>
+                      Selamat datang, <span className="font-semibold">{user.namaMahasiswa}</span>
                     </p>
                     <p className="text-sm text-gray-500">NIM: {user.nim}</p>
                   </div>

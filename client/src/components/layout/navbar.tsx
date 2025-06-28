@@ -67,10 +67,10 @@ export default function Navbar() {
                     <Button variant="ghost" className="flex items-center space-x-2">
                       <Avatar className="h-8 w-8">
                         <AvatarFallback>
-                          {user?.nama_mahasiswa?.substring(0, 2).toUpperCase() || "U"}
+                          {user?.namaMahasiswa?.substring(0, 2).toUpperCase() || "U"}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="hidden lg:block">{user?.nama_mahasiswa}</span>
+                      <span className="hidden lg:block">{user?.namaMahasiswa}</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
@@ -122,10 +122,10 @@ export default function Navbar() {
                         <div className="flex items-center space-x-3 mb-4">
                           <Avatar className="h-10 w-10">
                             <AvatarFallback>
-                              {user?.nama_mahasiswa?.substring(0, 2).toUpperCase() || "U"}
+                              {user?.namaMahasiswa?.substring(0, 2).toUpperCase() || "U"}
                             </AvatarFallback>
                           </Avatar>
-                          <span className="font-semibold">{user?.nama_mahasiswa}</span>
+                          <span className="font-semibold">{user?.namaMahasiswa}</span>
                         </div>
                         <div className="space-y-2">
                           <Button

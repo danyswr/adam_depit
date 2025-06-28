@@ -1,4 +1,4 @@
-import { users, type User, type InsertUser } from "@shared/schema";
+import { type User, type InsertUser } from "@shared/schema";
 
 // This is a placeholder storage interface since we're using Google Sheets as the actual database
 // The real storage operations will be handled by the Google Apps Script API

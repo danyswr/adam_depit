@@ -87,7 +87,7 @@ export default function Admin() {
                 <div className="flex items-center space-x-4">
                   <Avatar className="h-16 w-16">
                     <AvatarFallback className="text-lg bg-accent">
-                      {user?.nama_mahasiswa.substring(0, 2).toUpperCase()}
+                      {user?.namaMahasiswa.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div>

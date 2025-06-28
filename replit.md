@@ -86,7 +86,26 @@ A full-stack web application for managing and showcasing University Student Orga
 - **Development Tools**: Replit integration with runtime error overlay
 
 ## Changelog
-- June 28, 2025. Initial setup
+- June 28, 2025: Initial setup
+- June 28, 2025: Fixed Google Sheets integration with updated schema and API structure
+- June 28, 2025: Updated user authentication to use proper field names (namaMahasiswa, nomorWhatsapp, role)
+- June 28, 2025: Created comprehensive Google Apps Script file for backend integration
+
+## Setup Instructions
+To connect the website with Google Sheets:
+
+1. **Copy Google Apps Script Code**: Use the code from `google-apps-script.gs` file
+2. **Create Google Apps Script Project**: 
+   - Go to script.google.com
+   - Create new project
+   - Paste the code from `google-apps-script.gs`
+   - Update FOLDER_ID with your Google Drive folder ID
+3. **Deploy as Web App**:
+   - Click Deploy > New Deployment
+   - Choose "Web app" as type
+   - Set execute as "Me" and access to "Anyone"
+   - Copy the web app URL and update API_URL in client/src/lib/api.ts
+4. **Create Spreadsheet Sheets**: The script will auto-create required sheets (Users, UKM, Daftar)
 
 ## User Preferences
 
