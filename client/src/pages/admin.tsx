@@ -87,6 +87,12 @@ export default function Admin() {
     prestasi: row[5]
   }));
 
+  // Debug logging
+  console.log("Raw UKMs data:", rawUkms);
+  console.log("Transformed UKMs:", ukms);
+  console.log("Admin UKMs:", adminUKMs);
+  console.log("Filtered UKMs:", filteredUKMs);
+
   // Filter UKMs by current admin user - check both userId and email
   // If id_users is empty, show all UKMs for now (will fix with proper data)
   const adminUKMs = ukms.filter((ukm: any) => {
@@ -106,7 +112,7 @@ export default function Admin() {
   )
 
   // Calculate real admin stats from actual data
-  const adminUKMIds = adminUKMs.map((ukm: any) => ukm[0])
+  const adminUKMIds = adminUKMs.map((ukm: any) => ukm.id_ukm)
   const adminRegistrations = registrations.filter((reg: any) => adminUKMIds.includes(reg[2]))
 
   const adminStats = {
