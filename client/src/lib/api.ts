@@ -39,14 +39,11 @@ export async function apiCall<T = any>(data: any): Promise<ApiResponse<T>> {
     // Provide demo data for development
     console.log('Using demo data due to connection issues');
     
+    // Don't show demo data for UKM anymore - return empty data if connection fails
     if (data.sheet === 'UKM' && data.action === 'read') {
       return {
         success: true,
-        data: transformUKMData([
-          ['1', 'Robotika', 'https://via.placeholder.com/400x300/3B82F6/FFFFFF?text=Robotika', 'Unit kegiatan mahasiswa yang berfokus pada pengembangan teknologi robotika dan automasi.', 'admin@example.com', 'Juara 1 Kontes Robot Indonesia 2024'],
-          ['2', 'KSR PMI', 'https://via.placeholder.com/400x300/EF4444/FFFFFF?text=KSR+PMI', 'Korps Sukarela Palang Merah Indonesia yang bergerak di bidang kemanusiaan dan kesehatan.', 'admin@example.com', 'Relawan Terbaik Provinsi 2024'],
-          ['3', 'Bahasa & Sastra', 'https://via.placeholder.com/400x300/10B981/FFFFFF?text=Bahasa', 'Komunitas pecinta bahasa dan sastra Indonesia yang aktif dalam berbagai kegiatan literasi.', 'admin@example.com', 'Juara 2 Lomba Karya Tulis Nasional 2024']
-        ])
+        data: []
       };
     }
 

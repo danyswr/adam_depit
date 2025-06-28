@@ -14,14 +14,14 @@ export default function Dashboard() {
   const [selectedUKM, setSelectedUKM] = useState<UKM | null>(null);
   const { data: userUKMsResponse } = useUserUKMs();
 
-  // Mock user stats - in real app this would come from API
-  const userStats = {
-    registeredUKM: 3,
-    upcomingEvents: 5,
-    activityPoints: 750,
-  };
-
   const userUKMs = userUKMsResponse?.success ? userUKMsResponse.data || [] : [];
+  
+  // Calculate real stats from actual data
+  const userStats = {
+    registeredUKM: userUKMs.length,
+    upcomingEvents: 0, // Will be calculated from real event data when available
+    activityPoints: userUKMs.length * 100, // 100 points per UKM registration
+  };
 
   if (!user) {
     return (
@@ -159,8 +159,8 @@ export default function Dashboard() {
                               nama_ukm: ukm[1],
                               gambar_url: ukm[2],
                               deskripsi: ukm[3],
-                              created_at: ukm[4],
-                              updated_at: ukm[5],
+                              id_users: ukm[4],
+                              prestasi: ukm[5],
                             })}
                           >
                             <Eye className="mr-1 h-3 w-3" />

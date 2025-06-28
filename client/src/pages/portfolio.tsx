@@ -23,8 +23,8 @@ export default function Portfolio() {
       ukm[1]?.toLowerCase().includes(searchTerm.toLowerCase()) || // nama_ukm
       ukm[3]?.toLowerCase().includes(searchTerm.toLowerCase());   // deskripsi
     
-    // Category filtering would need to be implemented based on UKM data structure
-    const matchesCategory = !categoryFilter; // For now, no category filtering
+    // Category filtering - "all" or empty means show all
+    const matchesCategory = !categoryFilter || categoryFilter === "all";
     
     return matchesSearch && matchesCategory;
   });
@@ -64,7 +64,7 @@ export default function Portfolio() {
                       <SelectValue placeholder="Semua Kategori" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Semua Kategori</SelectItem>
+                      <SelectItem value="all">Semua Kategori</SelectItem>
                       <SelectItem value="seni">Seni & Budaya</SelectItem>
                       <SelectItem value="olahraga">Olahraga</SelectItem>
                       <SelectItem value="teknologi">Teknologi</SelectItem>
@@ -96,8 +96,8 @@ export default function Portfolio() {
                     nama_ukm: ukm[1],
                     gambar_url: ukm[2],
                     deskripsi: ukm[3],
-                    created_at: ukm[4],
-                    updated_at: ukm[5],
+                    id_users: ukm[4],
+                    prestasi: ukm[5],
                   }}
                   onViewDetail={setSelectedUKM}
                 />
