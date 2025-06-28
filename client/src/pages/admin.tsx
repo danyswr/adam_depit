@@ -84,7 +84,7 @@ export default function Admin() {
     // If id_users is empty or null, temporarily show for all admins
     // This will be fixed when UKMs are created with proper user IDs
     if (!ukm[4] || ukm[4] === "") {
-      return true; // Show UKMs with empty id_users for now
+      return user?.role === "admin"; // Only show to admins when id_users is empty
     }
     return ukm[4] === user?.userId || ukm[4] === user?.email
   })
@@ -446,7 +446,7 @@ export default function Admin() {
                                   src={
                                     ukm[2] ? 
                                       ukm[2].includes('drive.google.com') ? 
-                                        ukm[2].replace('/uc?export=view&id=', '/thumbnail?id=').replace('&', '&sz=w200-h200-c') :
+                                        `https://drive.google.com/thumbnail?id=${ukm[2].split('id=')[1]}&sz=w200-h200-c` :
                                         ukm[2] :
                                       "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100"
                                   }
@@ -493,7 +493,10 @@ export default function Admin() {
                           >
                             <Users className="w-4 h-4" />
                             <span className="font-medium">
-                              {registrations.filter((reg: any) => reg[2] === ukm[0]).length} anggota
+                              {(() => {
+                                const memberCount = registrations.filter((reg: any) => reg[2] === ukm[0]).length;
+                                return memberCount;
+                              })()} anggota
                             </span>
                           </Button>
                         </TableCell>
