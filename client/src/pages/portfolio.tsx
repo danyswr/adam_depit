@@ -90,6 +90,7 @@ export default function Portfolio() {
 
   // Helper function to determine category from UKM name
   const getCategoryFromName = (name: string) => {
+    if (!name || typeof name !== 'string') return "all"
     const lowerName = name.toLowerCase()
     if (lowerName.includes("seni") || lowerName.includes("musik") || lowerName.includes("teater")) return "seni"
     if (lowerName.includes("olahraga") || lowerName.includes("basket") || lowerName.includes("futsal"))
@@ -449,7 +450,7 @@ export default function Portfolio() {
                     : "space-y-6"
                 }
               >
-                {filteredAndSortedUKMs.map((ukm: any, index) => (
+                {filteredAndSortedUKMs.map((ukm: any, index: number) => (
                   <div
                     key={ukm[0]}
                     className="animate-in fade-in slide-in-from-bottom-4 duration-500"
