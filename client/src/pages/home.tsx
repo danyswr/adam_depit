@@ -89,6 +89,10 @@ export default function Home() {
     ? ukmsResponse.data?.slice(0, 6) || []
     : [];
   const showDemoAlert = !ukmsResponse?.success;
+  
+  // Debug logging
+  console.log("Home UKMs response:", ukmsResponse);
+  console.log("Home UKMs data:", ukms);
 
   // Scroll effects
   useEffect(() => {

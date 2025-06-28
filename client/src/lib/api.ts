@@ -30,9 +30,12 @@ export async function apiCall<T = any>(data: any): Promise<ApiResponse<T>> {
     
     // Transform data for UKM read operations
     if (result.success && data.sheet === 'UKM' && data.action === 'read' && Array.isArray(result.data)) {
+      console.log("Raw UKM data before transform:", result.data);
+      const transformedData = transformUKMData(result.data);
+      console.log("Transformed UKM data:", transformedData);
       return {
         ...result,
-        data: transformUKMData(result.data)
+        data: transformedData
       };
     }
     
@@ -135,7 +138,8 @@ export async function registerUser(userData: any) {
 
 // Transform array data from Google Sheets to objects
 function transformUKMData(data: any[]): any[] {
-  return data.map((row: any[]) => ({
+  console.log("Transform input data:", data);
+  const transformed = data.map((row: any[]) => ({
     id_ukm: row[0],
     nama_ukm: row[1],
     gambar_url: row[2], // Use URL directly from Google Apps Script
@@ -143,6 +147,8 @@ function transformUKMData(data: any[]): any[] {
     id_users: row[4],
     prestasi: row[5]
   }));
+  console.log("Transform output data:", transformed);
+  return transformed;
 }
 
 function transformUserData(userData: any[]): any {
@@ -166,11 +172,15 @@ export async function getUKMs(email: string = 'guest@example.com') {
     email,
   });
   
+  console.log("getUKMs raw response:", response);
+  
   // Transform array data to object format for easier use
   if (response.success && response.data) {
+    const transformed = transformUKMData(response.data);
+    console.log("getUKMs transformed:", transformed);
     return {
       success: true,
-      data: transformUKMData(response.data)
+      data: transformed
     };
   }
   

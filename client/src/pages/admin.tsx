@@ -97,10 +97,10 @@ export default function Admin() {
   )
 
   // Debug logging
-  console.log("Raw UKMs data:", rawUkms);
-  console.log("Transformed UKMs:", ukms);
-  console.log("Admin UKMs:", adminUKMs);
-  console.log("Filtered UKMs:", filteredUKMs);
+  console.log("Admin UKMs response:", ukmsResponse);
+  console.log("Admin UKMs data:", ukms);
+  console.log("Admin filtered UKMs:", adminUKMs);
+  console.log("Final filtered UKMs:", filteredUKMs);
 
   // Calculate real admin stats from actual data
   const adminUKMIds = adminUKMs.map((ukm: any) => ukm.id_ukm)
