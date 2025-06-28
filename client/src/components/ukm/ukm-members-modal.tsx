@@ -51,7 +51,9 @@ export default function UKMMembersModal({
   const registrations = registrationsResponse?.success ? registrationsResponse.data || [] : []
   
   // Filter registrations for this specific UKM
-  const ukmMembers = registrations.filter((reg: any) => reg[2] === ukm[0])
+  // Check if ukm is object or array format
+  const ukmId = ukm.id_ukm || ukm[0]
+  const ukmMembers = registrations.filter((reg: any) => reg[2] === ukmId)
   
   // Filter members based on search term
   const filteredMembers = ukmMembers.filter((member: any) =>
@@ -71,7 +73,7 @@ export default function UKMMembersModal({
               </div>
               <div>
                 <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                  Anggota {ukm[1]}
+                  Anggota {ukm.nama_ukm || ukm[1]}
                 </DialogTitle>
                 <p className="text-slate-600 mt-1">
                   Kelola dan pantau semua anggota yang terdaftar

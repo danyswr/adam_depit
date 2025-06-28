@@ -68,20 +68,21 @@ export async function apiCall<T = any>(data: any): Promise<ApiResponse<T>> {
 
     if (data.sheet === 'Users' && data.action === 'login') {
       // Demo login - accept any credentials
+      const isAdmin = data.email === 'admin@test.com';
       return {
         success: true,
         data: {
           userId: data.email,
-          namaMahasiswa: 'Demo User',
+          namaMahasiswa: isAdmin ? 'Admin Demo' : 'Demo User',
           email: data.email,
           nomorWhatsapp: '081234567890',
           nim: '12345678',
           gender: 'Laki-laki',
           jurusan: 'Teknik Informatika',
-          role: 'user',
+          role: isAdmin ? 'admin' : 'user',
           createdAt: new Date().toISOString()
         } as T,
-        redirect: '/dashboard'
+        redirect: isAdmin ? '/admin' : '/dashboard'
       };
     }
 
@@ -139,14 +140,29 @@ export async function registerUser(userData: any) {
 // Transform array data from Google Sheets to objects
 function transformUKMData(data: any[]): any[] {
   console.log("Transform input data:", data);
-  const transformed = data.map((row: any[]) => ({
-    id_ukm: row[0],
-    nama_ukm: row[1],
-    gambar_url: row[2], // Use URL directly from Google Apps Script
-    deskripsi: row[3],
-    id_users: row[4],
-    prestasi: row[5]
-  }));
+  if (!Array.isArray(data)) {
+    console.log("Data is not an array:", data);
+    return [];
+  }
+  
+  const transformed = data.map((row: any[], index: number) => {
+    console.log(`Processing row ${index}:`, row);
+    if (!Array.isArray(row)) {
+      console.log("Row is not an array:", row);
+      return row; // Return as-is if already transformed
+    }
+    
+    const transformedRow = {
+      id_ukm: row[0],
+      nama_ukm: row[1],
+      gambar_url: row[2], // Use URL directly from Google Apps Script
+      deskripsi: row[3],
+      id_users: row[4],
+      prestasi: row[5] || ""
+    };
+    console.log(`Transformed row ${index}:`, transformedRow);
+    return transformedRow;
+  });
   console.log("Transform output data:", transformed);
   return transformed;
 }
@@ -176,7 +192,12 @@ export async function getUKMs(email: string = 'guest@example.com') {
   
   // Transform array data to object format for easier use
   if (response.success && response.data) {
-    const transformed = transformUKMData(response.data);
+    // Check if data is already transformed object array or needs transformation
+    let transformed = response.data;
+    if (Array.isArray(response.data) && response.data.length > 0 && Array.isArray(response.data[0])) {
+      // Data is array of arrays, needs transformation
+      transformed = transformUKMData(response.data);
+    }
     console.log("getUKMs transformed:", transformed);
     return {
       success: true,
