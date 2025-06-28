@@ -281,13 +281,16 @@ function handleUKMCRUD(json) {
           });
         }
         
+        // Get user ID from email
+        const userId = getUserIdByEmail(email);
+        
         const createdAt = new Date().toISOString();
         const row = [
           ukmId, 
           data.nama_ukm || "", 
           imageUrl, 
           data.deskripsi || "", 
-          data.id_users || "", 
+          userId, // Set creator's user ID
           data.prestasi || ""
         ];
         
@@ -503,6 +506,15 @@ function getNamaUkmById(ukmId) {
   return ukm ? ukm[1] : null; // nama_ukm di kolom B
 }
 
+function getUserIdByEmail(email) {
+  const sheet = getSheet("Users");
+  if (!sheet) return null;
+  const data = sheet.getDataRange().getValues();
+  if (data.length <= 1) return null;
+  const user = data.slice(1).find(row => row[3] === email);
+  return user ? user[0] : null; // userId di kolom A
+}
+
 function findRowIndex(sheet, value, column) {
   try {
     const data = sheet.getDataRange().getValues();
@@ -566,6 +578,38 @@ function doPost(e) {
       success: false, 
       error: error.message 
     })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function uploadImageToDrive(imageData) {
+  try {
+    if (!imageData.imageData || !imageData.mimeType || !imageData.fileName) {
+      throw new Error("Missing image data, mime type, or file name");
+    }
+    
+    // Convert base64 to blob
+    const blob = Utilities.newBlob(
+      Utilities.base64Decode(imageData.imageData), 
+      imageData.mimeType, 
+      imageData.fileName
+    );
+    
+    // Get the target folder
+    const folder = DriveApp.getFolderById(FOLDER_ID);
+    
+    // Upload file to Drive
+    const file = folder.createFile(blob);
+    
+    // Make file publicly viewable
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    
+    // Return the direct image URL for display
+    const fileId = file.getId();
+    return `https://drive.google.com/uc?id=${fileId}`;
+    
+  } catch (error) {
+    console.error("Error uploading image to Drive:", error);
+    return ""; // Return empty string if upload fails
   }
 }
 
