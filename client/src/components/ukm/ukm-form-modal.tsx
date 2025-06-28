@@ -62,10 +62,38 @@ export default function UKMFormModal({
     },
   });
 
+  // Convert Google Drive URL to thumbnail format for better display
+  const convertToThumbnailUrl = (url: string) => {
+    if (!url) return url;
+    
+    // Extract file ID from Google Drive URL (both formats)
+    let fileId = '';
+    
+    // Format: https://drive.google.com/uc?export=view&id=FILE_ID
+    const ucMatch = url.match(/[?&]id=([a-zA-Z0-9-_]+)/);
+    if (ucMatch) {
+      fileId = ucMatch[1];
+    } else {
+      // Format: https://drive.google.com/file/d/FILE_ID/view
+      const fileMatch = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+      if (fileMatch) {
+        fileId = fileMatch[1];
+      }
+    }
+    
+    if (fileId) {
+      return `https://drive.google.com/thumbnail?id=${fileId}&sz=w500`;
+    }
+    
+    // If it's already a thumbnail URL or different format, return as is
+    return url;
+  };
+
   // Set preview image when editing existing UKM
   useEffect(() => {
     if (isEditing && ukm?.gambar_url) {
-      setPreviewImage(ukm.gambar_url);
+      const thumbnailUrl = convertToThumbnailUrl(ukm.gambar_url);
+      setPreviewImage(thumbnailUrl);
     } else {
       setPreviewImage(null);
     }

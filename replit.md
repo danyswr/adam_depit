@@ -108,6 +108,10 @@ A full-stack web application for managing and showcasing University Student Orga
 - June 28, 2025: Migrated admin panel to card layout displaying images, names, descriptions and member counts
 - June 28, 2025: Enhanced admin UKM management with better visual presentation similar to UKM cards
 - June 28, 2025: Completed migration from Replit Agent to standard Replit environment
+- June 28, 2025: Fixed admin panel UKM data display - now showing UKM data from Google Sheets correctly
+- June 28, 2025: Added missing prestasi field to UKM edit form
+- June 28, 2025: Fixed Google Drive image display in edit form by converting URLs to thumbnail format
+- June 28, 2025: Enhanced UKM edit form to pre-fill existing data when editing UKMs
 
 ## Setup Instructions
 To connect the website with Google Sheets:
