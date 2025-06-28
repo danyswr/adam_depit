@@ -73,27 +73,35 @@ export default function Admin() {
     enabled: !!user?.email,
   })
 
-  const ukms = ukmsResponse?.success ? ukmsResponse.data || [] : []
+  // Transform array data to object format like in UKM card
+  const rawUkms = ukmsResponse?.success ? ukmsResponse.data || [] : []
   const registrations = registrationsResponse?.success ? registrationsResponse.data || [] : []
 
-
+  const ukms = rawUkms.map((row: any[]) => ({
+    id_ukm: row[0],
+    nama_ukm: row[1],
+    gambar_url: row[2],
+    deskripsi: row[3],
+    id_users: row[4],
+    prestasi: row[5]
+  }));
 
   // Filter UKMs by current admin user - check both userId and email
   // If id_users is empty, show all UKMs for now (will fix with proper data)
   const adminUKMs = ukms.filter((ukm: any) => {
     // If id_users is empty or null, show all UKMs to admins
-    if (!ukm[4] || ukm[4] === "" || ukm[4] === undefined) {
+    if (!ukm.id_users || ukm.id_users === "" || ukm.id_users === undefined) {
       return user?.role === "admin"; // Show all UKMs with empty id_users to admins
     }
-    return ukm[4] === user?.userId || ukm[4] === user?.email
+    return ukm.id_users === user?.userId || ukm.id_users === user?.email
   })
 
   // Filter UKMs based on search term AND admin ownership
   const filteredUKMs = adminUKMs.filter(
     (ukm: any) =>
       !searchTerm ||
-      ukm[1]?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ukm[3]?.toLowerCase().includes(searchTerm.toLowerCase()),
+      ukm.nama_ukm?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      ukm.deskripsi?.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
   // Calculate real admin stats from actual data
@@ -432,54 +440,56 @@ export default function Admin() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredUKMs.map((ukm: any, index: number) => (
-                      <TableRow
-                        key={ukm[0]}
-                        className="hover:bg-slate-50/50 transition-all duration-200 border-b border-slate-100 group"
-                      >
-                        <TableCell className="py-4">
-                          <div className="flex items-center space-x-4">
-                            <div className="relative">
-                              <Avatar className="h-14 w-14 ring-2 ring-slate-200 group-hover:ring-blue-300 transition-all duration-200">
-                                <img
-                                  src={
-                                    ukm[2] ? 
-                                      ukm[2].includes('drive.google.com') ? 
-                                        (() => {
-                                          const fileId = ukm[2].match(/[?&]id=([^&]+)/)?.[1];
-                                          return fileId ? `https://drive.google.com/thumbnail?id=${fileId}&sz=w200-h200-c` : ukm[2];
-                                        })() :
-                                        ukm[2] :
-                                      "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100"
-                                  }
-                                  alt={ukm[1]}
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    e.currentTarget.src = "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100"
-                                  }}
-                                />
-                                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold">
-                                  {ukm[1]?.substring(0, 2).toUpperCase()}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
-                            </div>
-                            <div>
-                              <div className="font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">
-                                {ukm[1] || 'Nama UKM tidak tersedia'}
+                    {filteredUKMs.map((ukm: any, index: number) => {
+                      // Use same image transformation logic as UKM card
+                      let imageUrl = ukm.gambar_url && ukm.gambar_url.trim() !== "" ? ukm.gambar_url : "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100";
+                      
+                      if (imageUrl && imageUrl.includes("drive.google.com")) {
+                        const fileIdMatch = imageUrl.match(/(?:\/d\/|id=|&id=)([a-zA-Z0-9-_]+)/);
+                        if (fileIdMatch && fileIdMatch[1]) {
+                          imageUrl = `https://drive.google.com/thumbnail?id=${fileIdMatch[1]}&sz=w200`;
+                        }
+                      }
+
+                      return (
+                        <TableRow
+                          key={ukm.id_ukm}
+                          className="hover:bg-slate-50/50 transition-all duration-200 border-b border-slate-100 group"
+                        >
+                          <TableCell className="py-4">
+                            <div className="flex items-center space-x-4">
+                              <div className="relative">
+                                <Avatar className="h-14 w-14 ring-2 ring-slate-200 group-hover:ring-blue-300 transition-all duration-200">
+                                  <img
+                                    src={imageUrl}
+                                    alt={ukm.nama_ukm}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      e.currentTarget.src = "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100"
+                                    }}
+                                  />
+                                  <AvatarFallback className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold">
+                                    {ukm.nama_ukm?.substring(0, 2).toUpperCase()}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
                               </div>
-                              <div className="text-xs text-slate-500 flex items-center mt-1">
-                                <Clock className="w-3 h-3 mr-1" />
-                                Aktif sejak {new Date().getFullYear()}
+                              <div>
+                                <div className="font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">
+                                  {ukm.nama_ukm || 'Nama UKM tidak tersedia'}
+                                </div>
+                                <div className="text-xs text-slate-500 flex items-center mt-1">
+                                  <Clock className="w-3 h-3 mr-1" />
+                                  Aktif sejak {new Date().getFullYear()}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="max-w-xs">
-                            <p className="text-slate-700 text-sm line-clamp-2 leading-relaxed">{ukm[3] || 'Deskripsi tidak tersedia'}</p>
-                          </div>
-                        </TableCell>
+                          </TableCell>
+                          <TableCell>
+                            <div className="max-w-xs">
+                              <p className="text-slate-700 text-sm line-clamp-2 leading-relaxed">{ukm.deskripsi || 'Deskripsi tidak tersedia'}</p>
+                            </div>
+                          </TableCell>
                         <TableCell>
                           <Badge className="bg-green-100 text-green-800 border-green-200 shadow-sm">
                             <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse" />
@@ -495,10 +505,7 @@ export default function Admin() {
                           >
                             <Users className="w-4 h-4" />
                             <span className="font-medium">
-                              {(() => {
-                                const memberCount = registrations.filter((reg: any) => reg[2] === ukm[0]).length;
-                                return memberCount;
-                              })()} anggota
+                              {registrations.filter((reg: any) => reg[2] === ukm.id_ukm).length} anggota
                             </span>
                           </Button>
                         </TableCell>
@@ -515,16 +522,7 @@ export default function Admin() {
                               size="sm"
                               variant="outline"
                               className="border-blue-200 text-blue-600 hover:bg-blue-50 bg-white/80 backdrop-blur-sm shadow-sm"
-                              onClick={() =>
-                                setSelectedUKM({
-                                  id_ukm: ukm[0],
-                                  nama_ukm: ukm[1],
-                                  gambar_url: ukm[2],
-                                  deskripsi: ukm[3],
-                                  id_users: ukm[4],
-                                  prestasi: ukm[5],
-                                })
-                              }
+                              onClick={() => setSelectedUKM(ukm)}
                             >
                               <Eye className="h-3 w-3" />
                             </Button>
@@ -532,16 +530,7 @@ export default function Admin() {
                               size="sm"
                               variant="outline"
                               className="border-amber-200 text-amber-600 hover:bg-amber-50 bg-white/80 backdrop-blur-sm shadow-sm"
-                              onClick={() =>
-                                handleEditUKM({
-                                  id_ukm: ukm[0],
-                                  nama_ukm: ukm[1],
-                                  gambar_url: ukm[2],
-                                  deskripsi: ukm[3],
-                                  id_users: ukm[4],
-                                  prestasi: ukm[5],
-                                })
-                              }
+                              onClick={() => handleEditUKM(ukm)}
                             >
                               <Edit className="h-3 w-3" />
                             </Button>
@@ -549,23 +538,14 @@ export default function Admin() {
                               size="sm"
                               variant="outline"
                               className="border-red-200 text-red-600 hover:bg-red-50 bg-white/80 backdrop-blur-sm shadow-sm"
-                              onClick={() =>
-                                setDeletingUKM({
-                                  id_ukm: ukm[0],
-                                  nama_ukm: ukm[1],
-                                  gambar_url: ukm[2],
-                                  deskripsi: ukm[3],
-                                  id_users: ukm[4],
-                                  prestasi: ukm[5],
-                                })
-                              }
+                              onClick={() => setDeletingUKM(ukm)}
                             >
                               <Trash2 className="h-3 w-3" />
                             </Button>
                           </div>
                         </TableCell>
                       </TableRow>
-                    ))}
+                    )})}
                   </TableBody>
                 </Table>
               </div>
