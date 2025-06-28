@@ -79,8 +79,25 @@ export default function UKMCard({
     }
   }
 
+  // Helper function to determine category from UKM name
+  const getCategoryFromName = (name: string) => {
+    if (!name || typeof name !== 'string') return "umum"
+    const lowerName = name.toLowerCase()
+    if (lowerName.includes("seni") || lowerName.includes("musik") || lowerName.includes("teater")) return "seni"
+    if (lowerName.includes("olahraga") || lowerName.includes("basket") || lowerName.includes("futsal"))
+      return "olahraga"
+    if (lowerName.includes("teknologi") || lowerName.includes("robotika") || lowerName.includes("komputer"))
+      return "teknologi"
+    if (lowerName.includes("sosial") || lowerName.includes("peduli")) return "sosial"
+    if (lowerName.includes("akademik") || lowerName.includes("penelitian")) return "akademik"
+    if (lowerName.includes("fotografi") || lowerName.includes("photo")) return "fotografi"
+    if (lowerName.includes("bisnis") || lowerName.includes("entrepreneur")) return "bisnis"
+    return "umum"
+  }
+
   // Get category color based on UKM name/type
   const getCategoryColor = (name: string) => {
+    if (!name || typeof name !== 'string') return "gray";
     const lowerName = name.toLowerCase();
     if (
       lowerName.includes("teknologi") ||
@@ -175,7 +192,7 @@ export default function UKMCard({
               className={`text-xs bg-${categoryColor}-500/90 backdrop-blur-sm text-white border-0 shadow-lg`}
             >
               <Sparkles className="w-2 h-2 mr-1" />
-              {ukm.kategori || "Umum"}
+              {getCategoryFromName(ukm.nama_ukm) || "Umum"}
             </Badge>
           </div>
         </div>
@@ -237,9 +254,9 @@ export default function UKMCard({
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2">
-          {["Kreatif", "Inovatif", "Prestasi"].map((tag, index) => (
+          {["Kreatif", "Inovatif", "Prestasi"].map((tag) => (
             <Badge
-              key={index}
+              key={tag}
               variant="outline"
               className="text-xs border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 transition-colors"
             >
