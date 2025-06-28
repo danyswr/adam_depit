@@ -1,12 +1,19 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,7 +23,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 import {
   Plus,
   Search,
@@ -42,41 +49,43 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   ChevronRight,
-} from "lucide-react"
-import { useAuth } from "@/lib/auth"
-import { useUKMs, useDeleteUKM } from "@/hooks/use-ukm"
-import { useQuery } from "@tanstack/react-query"
-import UKMFormModal from "@/components/ukm/ukm-form-modal"
-import UKMDetailModal from "@/components/ukm/ukm-detail-modal"
-import UKMMembersModal from "@/components/ukm/ukm-members-modal"
-import UKMCard from "@/components/ukm/ukm-card"
-import type { UKM } from "@shared/schema"
-import { Link } from "wouter"
-import { getAllRegistrations } from "@/lib/api"
+} from "lucide-react";
+import { useAuth } from "@/lib/auth";
+import { useUKMs, useDeleteUKM } from "@/hooks/use-ukm";
+import { useQuery } from "@tanstack/react-query";
+import UKMFormModal from "@/components/ukm/ukm-form-modal";
+import UKMDetailModal from "@/components/ukm/ukm-detail-modal";
+import UKMMembersModal from "@/components/ukm/ukm-members-modal";
+import UKMCard from "@/components/ukm/ukm-card";
+import type { UKM } from "@shared/schema";
+import { Link } from "wouter";
+import { getAllRegistrations } from "@/lib/api";
 
 export default function Admin() {
-  const { user, isAdmin } = useAuth()
-  const [selectedUKM, setSelectedUKM] = useState<UKM | null>(null)
-  const [editingUKM, setEditingUKM] = useState<UKM | null>(null)
-  const [deletingUKM, setDeletingUKM] = useState<UKM | null>(null)
-  const [showUKMForm, setShowUKMForm] = useState(false)
-  const [showMembersModal, setShowMembersModal] = useState(false)
-  const [selectedUKMForMembers, setSelectedUKMForMembers] = useState<any>(null)
-  const [searchTerm, setSearchTerm] = useState("")
+  const { user, isAdmin } = useAuth();
+  const [selectedUKM, setSelectedUKM] = useState<UKM | null>(null);
+  const [editingUKM, setEditingUKM] = useState<UKM | null>(null);
+  const [deletingUKM, setDeletingUKM] = useState<UKM | null>(null);
+  const [showUKMForm, setShowUKMForm] = useState(false);
+  const [showMembersModal, setShowMembersModal] = useState(false);
+  const [selectedUKMForMembers, setSelectedUKMForMembers] = useState<any>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: ukmsResponse, isLoading, refetch } = useUKMs()
-  const deleteMutation = useDeleteUKM()
+  const { data: ukmsResponse, isLoading, refetch } = useUKMs();
+  const deleteMutation = useDeleteUKM();
 
   // Fetch registration data for statistics
   const { data: registrationsResponse } = useQuery({
     queryKey: ["/api/registrations", user?.email],
     queryFn: () => getAllRegistrations(user?.email || "guest@example.com"),
     enabled: !!user?.email,
-  })
+  });
 
   // Get UKM data (already transformed to object format by getUKMs)
-  const ukms = ukmsResponse?.success ? ukmsResponse.data || [] : []
-  const registrations = registrationsResponse?.success ? registrationsResponse.data || [] : []
+  const ukms = ukmsResponse?.success ? ukmsResponse.data || [] : [];
+  const registrations = registrationsResponse?.success
+    ? registrationsResponse.data || []
+    : [];
 
   // Filter UKMs by current admin user - check both userId and email
   // If id_users is empty, show all UKMs for now (will fix with proper data)
@@ -85,8 +94,8 @@ export default function Admin() {
     if (!ukm.id_users || ukm.id_users === "" || ukm.id_users === undefined) {
       return user?.role === "admin"; // Show all UKMs with empty id_users to admins
     }
-    return ukm.id_users === user?.userId || ukm.id_users === user?.email
-  })
+    return ukm.id_users === user?.userId || ukm.id_users === user?.email;
+  });
 
   // Filter UKMs based on search term AND admin ownership
   const filteredUKMs = adminUKMs.filter(
@@ -94,7 +103,7 @@ export default function Admin() {
       !searchTerm ||
       ukm.nama_ukm?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       ukm.deskripsi?.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  );
 
   // Debug logging
   console.log("Admin UKMs response:", ukmsResponse);
@@ -103,46 +112,52 @@ export default function Admin() {
   console.log("Final filtered UKMs:", filteredUKMs);
 
   // Calculate real admin stats from actual data
-  const adminUKMIds = adminUKMs.map((ukm: any) => ukm.id_ukm)
-  const adminRegistrations = registrations.filter((reg: any) => adminUKMIds.includes(reg[2]))
+  const adminUKMIds = adminUKMs.map((ukm: any) => ukm.id_ukm);
+  const adminRegistrations = registrations.filter((reg: any) =>
+    adminUKMIds.includes(reg[2]),
+  );
 
   const adminStats = {
     totalUKM: adminUKMs.length,
     totalMembers: adminRegistrations.length,
     newRegistrations: adminRegistrations.filter((reg: any) => {
-      const regDate = new Date(reg[4])
-      const today = new Date()
-      const daysDiff = Math.floor((today.getTime() - regDate.getTime()) / (1000 * 60 * 60 * 24))
-      return daysDiff <= 7
+      const regDate = new Date(reg[4]);
+      const today = new Date();
+      const daysDiff = Math.floor(
+        (today.getTime() - regDate.getTime()) / (1000 * 60 * 60 * 24),
+      );
+      return daysDiff <= 7;
     }).length,
     dailyActivity: adminRegistrations.filter((reg: any) => {
-      const regDate = new Date(reg[4])
-      const today = new Date()
-      const daysDiff = Math.floor((today.getTime() - regDate.getTime()) / (1000 * 60 * 60 * 24))
-      return daysDiff === 0
+      const regDate = new Date(reg[4]);
+      const today = new Date();
+      const daysDiff = Math.floor(
+        (today.getTime() - regDate.getTime()) / (1000 * 60 * 60 * 24),
+      );
+      return daysDiff === 0;
     }).length,
-  }
+  };
 
   const handleDeleteUKM = async () => {
-    if (!deletingUKM) return
-    await deleteMutation.mutateAsync(deletingUKM.id_ukm)
-    setDeletingUKM(null)
-  }
+    if (!deletingUKM) return;
+    await deleteMutation.mutateAsync(deletingUKM.id_ukm);
+    setDeletingUKM(null);
+  };
 
   const handleEditUKM = (ukm: UKM) => {
-    setEditingUKM(ukm)
-    setShowUKMForm(true)
-  }
+    setEditingUKM(ukm);
+    setShowUKMForm(true);
+  };
 
   const handleFormSuccess = () => {
-    setEditingUKM(null)
-    refetch()
-  }
+    setEditingUKM(null);
+    refetch();
+  };
 
   const handleViewMembers = (ukm: any) => {
-    setSelectedUKMForMembers(ukm)
-    setShowMembersModal(true)
-  }
+    setSelectedUKMForMembers(ukm);
+    setShowMembersModal(true);
+  };
 
   if (!isAdmin) {
     return (
@@ -159,9 +174,12 @@ export default function Admin() {
               <div className="w-20 h-20 bg-gradient-to-r from-red-500 to-pink-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
                 <Shield className="w-10 h-10 text-white" />
               </div>
-              <h1 className="text-3xl font-bold text-white mb-4">Akses Ditolak</h1>
+              <h1 className="text-3xl font-bold text-white mb-4">
+                Akses Ditolak
+              </h1>
               <p className="text-white/70 mb-8 leading-relaxed">
-                Halaman ini khusus untuk administrator. Silakan login dengan akun admin untuk melanjutkan.
+                Halaman ini khusus untuk administrator. Silakan login dengan
+                akun admin untuk melanjutkan.
               </p>
               <Link href="/">
                 <Button className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 px-8 py-3">
@@ -173,7 +191,7 @@ export default function Admin() {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -187,40 +205,6 @@ export default function Admin() {
       </div>
 
       <div className="relative z-10">
-        {/* Top Navigation */}
-        <nav className="bg-white/80 backdrop-blur-xl border-b border-white/20 sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
-              <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
-                  <Crown className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                    Admin Dashboard
-                  </h1>
-                  <p className="text-sm text-slate-500">Portfolio UKM Management</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-4">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="relative text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl"
-                >
-                  <Bell className="w-5 h-5" />
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-                </Button>
-                <Avatar className="h-10 w-10 ring-2 ring-amber-200 ring-offset-2">
-                  <AvatarFallback className="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold">
-                    {user?.namaMahasiswa.substring(0, 2).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-            </div>
-          </div>
-        </nav>
-
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Welcome Section */}
           <div className="mb-8">
@@ -237,8 +221,12 @@ export default function Admin() {
                         <Sparkles className="w-7 h-7" />
                       </div>
                       <div>
-                        <h2 className="text-3xl font-bold">Selamat Datang, {user?.namaMahasiswa}!</h2>
-                        <p className="text-white/90 text-lg">Kelola UKM Anda dengan mudah dan efisien</p>
+                        <h2 className="text-3xl font-bold">
+                          Selamat Datang, {user?.namaMahasiswa}!
+                        </h2>
+                        <p className="text-white/90 text-lg">
+                          Kelola UKM Anda dengan mudah dan efisien
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-6 text-white/80">
@@ -289,15 +277,21 @@ export default function Admin() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-600 text-sm font-medium mb-1">Total UKM</p>
+                    <p className="text-slate-600 text-sm font-medium mb-1">
+                      Total UKM
+                    </p>
                     <div className="flex items-baseline gap-2">
-                      <p className="text-3xl font-bold text-slate-800">{adminStats.totalUKM}</p>
+                      <p className="text-3xl font-bold text-slate-800">
+                        {adminStats.totalUKM}
+                      </p>
                       <div className="flex items-center text-green-600 text-xs">
                         <ArrowUpRight className="w-3 h-3 mr-1" />
                         +12%
                       </div>
                     </div>
-                    <p className="text-slate-500 text-xs mt-1">UKM yang dikelola</p>
+                    <p className="text-slate-500 text-xs mt-1">
+                      UKM yang dikelola
+                    </p>
                   </div>
                   <div className="w-14 h-14 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
                     <University className="h-7 w-7 text-white" />
@@ -314,9 +308,13 @@ export default function Admin() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-600 text-sm font-medium mb-1">Total Anggota</p>
+                    <p className="text-slate-600 text-sm font-medium mb-1">
+                      Total Anggota
+                    </p>
                     <div className="flex items-baseline gap-2">
-                      <p className="text-3xl font-bold text-slate-800">{adminStats.totalMembers}</p>
+                      <p className="text-3xl font-bold text-slate-800">
+                        {adminStats.totalMembers}
+                      </p>
                       <div className="flex items-center text-green-600 text-xs">
                         <ArrowUpRight className="w-3 h-3 mr-1" />
                         +8%
@@ -339,15 +337,21 @@ export default function Admin() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-600 text-sm font-medium mb-1">Pendaftar Baru</p>
+                    <p className="text-slate-600 text-sm font-medium mb-1">
+                      Pendaftar Baru
+                    </p>
                     <div className="flex items-baseline gap-2">
-                      <p className="text-3xl font-bold text-slate-800">{adminStats.newRegistrations}</p>
+                      <p className="text-3xl font-bold text-slate-800">
+                        {adminStats.newRegistrations}
+                      </p>
                       <div className="flex items-center text-green-600 text-xs">
                         <ArrowUpRight className="w-3 h-3 mr-1" />
                         +24%
                       </div>
                     </div>
-                    <p className="text-slate-500 text-xs mt-1">7 hari terakhir</p>
+                    <p className="text-slate-500 text-xs mt-1">
+                      7 hari terakhir
+                    </p>
                   </div>
                   <div className="w-14 h-14 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
                     <UserPlus className="h-7 w-7 text-white" />
@@ -364,15 +368,21 @@ export default function Admin() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-600 text-sm font-medium mb-1">Aktivitas Hari Ini</p>
+                    <p className="text-slate-600 text-sm font-medium mb-1">
+                      Aktivitas Hari Ini
+                    </p>
                     <div className="flex items-baseline gap-2">
-                      <p className="text-3xl font-bold text-slate-800">{adminStats.dailyActivity}</p>
+                      <p className="text-3xl font-bold text-slate-800">
+                        {adminStats.dailyActivity}
+                      </p>
                       <div className="flex items-center text-green-600 text-xs">
                         <ArrowUpRight className="w-3 h-3 mr-1" />
                         +15%
                       </div>
                     </div>
-                    <p className="text-slate-500 text-xs mt-1">Pendaftar hari ini</p>
+                    <p className="text-slate-500 text-xs mt-1">
+                      Pendaftar hari ini
+                    </p>
                   </div>
                   <div className="w-14 h-14 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
                     <Activity className="h-7 w-7 text-white" />
@@ -393,7 +403,9 @@ export default function Admin() {
                   <CardTitle className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
                     Manajemen UKM
                   </CardTitle>
-                  <p className="text-slate-600 mt-1">Kelola dan pantau semua UKM yang Anda buat</p>
+                  <p className="text-slate-600 mt-1">
+                    Kelola dan pantau semua UKM yang Anda buat
+                  </p>
                 </div>
                 <div className="flex flex-col sm:flex-row w-full lg:w-auto gap-4">
                   <div className="relative">
@@ -430,8 +442,12 @@ export default function Admin() {
                   <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <University className="w-12 h-12 text-slate-400" />
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-800 mb-2">Tidak ada UKM</h3>
-                  <p className="text-slate-600 mb-6">Belum ada UKM yang dibuat. Mulai dengan menambah UKM baru.</p>
+                  <h3 className="text-lg font-semibold text-slate-800 mb-2">
+                    Tidak ada UKM
+                  </h3>
+                  <p className="text-slate-600 mb-6">
+                    Belum ada UKM yang dibuat. Mulai dengan menambah UKM baru.
+                  </p>
                   <Button
                     onClick={() => setShowUKMForm(true)}
                     className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
@@ -475,11 +491,23 @@ export default function Admin() {
       </div>
 
       {/* Modals */}
-      <UKMFormModal open={showUKMForm} onOpenChange={setShowUKMForm} ukm={editingUKM} onSuccess={handleFormSuccess} />
-      <UKMDetailModal ukm={selectedUKM} open={!!selectedUKM} onOpenChange={(open) => !open && setSelectedUKM(null)} />
+      <UKMFormModal
+        open={showUKMForm}
+        onOpenChange={setShowUKMForm}
+        ukm={editingUKM}
+        onSuccess={handleFormSuccess}
+      />
+      <UKMDetailModal
+        ukm={selectedUKM}
+        open={!!selectedUKM}
+        onOpenChange={(open) => !open && setSelectedUKM(null)}
+      />
 
       {/* Delete Confirmation */}
-      <AlertDialog open={!!deletingUKM} onOpenChange={() => setDeletingUKM(null)}>
+      <AlertDialog
+        open={!!deletingUKM}
+        onOpenChange={() => setDeletingUKM(null)}
+      >
         <AlertDialogContent className="bg-white/95 backdrop-blur-xl border-white/20 shadow-2xl">
           <AlertDialogHeader>
             <div className="flex items-center mb-6">
@@ -487,13 +515,19 @@ export default function Admin() {
                 <Trash2 className="h-8 w-8 text-white" />
               </div>
               <div>
-                <AlertDialogTitle className="text-2xl font-bold text-slate-800">Hapus UKM</AlertDialogTitle>
-                <p className="text-slate-600 text-sm">Tindakan ini tidak dapat dibatalkan</p>
+                <AlertDialogTitle className="text-2xl font-bold text-slate-800">
+                  Hapus UKM
+                </AlertDialogTitle>
+                <p className="text-slate-600 text-sm">
+                  Tindakan ini tidak dapat dibatalkan
+                </p>
               </div>
             </div>
             <AlertDialogDescription className="text-slate-700 bg-red-50 p-6 rounded-2xl border border-red-200 leading-relaxed">
-              Apakah Anda yakin ingin menghapus UKM <strong>{deletingUKM?.nama_ukm}</strong>? Semua data terkait
-              termasuk anggota, kegiatan, dan riwayat akan ikut terhapus secara permanen.
+              Apakah Anda yakin ingin menghapus UKM{" "}
+              <strong>{deletingUKM?.nama_ukm}</strong>? Semua data terkait
+              termasuk anggota, kegiatan, dan riwayat akan ikut terhapus secara
+              permanen.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-3 pt-6">
