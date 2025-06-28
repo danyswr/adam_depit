@@ -223,3 +223,11 @@ export async function unregisterFromUKM(email: string, ukmId: string) {
     id_ukm: ukmId,
   });
 }
+
+export async function getAllRegistrations(email: string) {
+  return apiCall({
+    sheet: 'Daftar',
+    action: 'read',
+    email,
+  });
+}

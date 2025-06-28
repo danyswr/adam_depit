@@ -8,10 +8,12 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Plus, Search, RefreshCw, Edit, Trash2, University, Users, UserPlus, TrendingUp } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useUKMs, useDeleteUKM } from "@/hooks/use-ukm";
+import { useQuery } from "@tanstack/react-query";
 import UKMFormModal from "@/components/ukm/ukm-form-modal";
 import UKMDetailModal from "@/components/ukm/ukm-detail-modal";
 import { UKM } from "@shared/schema";
 import { Link } from "wouter";
+import { getAllRegistrations } from "@/lib/api";
 
 export default function Admin() {
   const { user, isAdmin } = useAuth();
@@ -24,7 +26,15 @@ export default function Admin() {
   const { data: ukmsResponse, isLoading, refetch } = useUKMs();
   const deleteMutation = useDeleteUKM();
 
+  // Fetch registration data for statistics
+  const { data: registrationsResponse } = useQuery({
+    queryKey: ['/api/registrations', user?.email],
+    queryFn: () => getAllRegistrations(user?.email || ''),
+    enabled: !!user?.email,
+  });
+
   const ukms = ukmsResponse?.success ? ukmsResponse.data || [] : [];
+  const registrations = registrationsResponse?.success ? registrationsResponse.data || [] : [];
 
   // Filter UKMs by current admin user
   const adminUKMs = ukms.filter((ukm: any) => ukm[4] === user?.userId); // id_users at index 4
@@ -36,12 +46,27 @@ export default function Admin() {
     ukm[3]?.toLowerCase().includes(searchTerm.toLowerCase())    // deskripsi
   );
   
-  // Real admin stats from actual data
+  // Calculate real admin stats from actual data
+  const adminUKMIds = adminUKMs.map((ukm: any) => ukm[0]); // Get admin's UKM IDs
+  const adminRegistrations = registrations.filter((reg: any) => 
+    adminUKMIds.includes(reg[2]) // reg[2] is id_ukm
+  );
+  
   const adminStats = {
     totalUKM: adminUKMs.length,
-    totalMembers: 0, // Will be calculated from registrations when available
-    newRegistrations: 0, // Will be calculated from recent registrations
-    dailyActivity: 0, // Will be calculated from activity data
+    totalMembers: adminRegistrations.length,
+    newRegistrations: adminRegistrations.filter((reg: any) => {
+      const regDate = new Date(reg[4]); // reg[4] is created_at
+      const today = new Date();
+      const daysDiff = Math.floor((today.getTime() - regDate.getTime()) / (1000 * 60 * 60 * 24));
+      return daysDiff <= 7; // New registrations in last 7 days
+    }).length,
+    dailyActivity: adminRegistrations.filter((reg: any) => {
+      const regDate = new Date(reg[4]); // reg[4] is created_at
+      const today = new Date();
+      const daysDiff = Math.floor((today.getTime() - regDate.getTime()) / (1000 * 60 * 60 * 24));
+      return daysDiff === 0; // Today's registrations
+    }).length,
   };
 
   const handleDeleteUKM = async () => {

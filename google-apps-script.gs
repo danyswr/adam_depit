@@ -274,11 +274,16 @@ function handleUKMCRUD(json) {
         let imageUrl = "";
         
         if (data.imageData) {
+          console.log("Uploading image to Drive...");
           imageUrl = uploadImageToDrive({ 
             imageData: data.imageData, 
             mimeType: data.mimeType, 
             fileName: data.fileName 
           });
+          console.log("Image uploaded, URL:", imageUrl);
+          if (!imageUrl) {
+            console.error("Failed to upload image - imageUrl is empty");
+          }
         }
         
         // Get user ID from email
@@ -603,9 +608,9 @@ function uploadImageToDrive(imageData) {
     // Make file publicly viewable
     file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
     
-    // Return the direct image URL for display
+    // Return the direct image URL for display with export parameter
     const fileId = file.getId();
-    return `https://drive.google.com/uc?id=${fileId}`;
+    return `https://drive.google.com/uc?export=view&id=${fileId}`;
     
   } catch (error) {
     console.error("Error uploading image to Drive:", error);

@@ -17,14 +17,24 @@ interface UKMCardProps {
 export default function UKMCard({ ukm, onViewDetail, showActions = false, onEdit, onDelete, onJoinUKM, showJoinButton = false }: UKMCardProps) {
   const defaultImage = "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=400";
 
+  // Use uploaded image URL if available, otherwise use default
+  const imageUrl = ukm.gambar_url && ukm.gambar_url.trim() !== "" ? ukm.gambar_url : defaultImage;
+
   return (
     <Card className="overflow-hidden hover-scale transition-all duration-300 border border-gray-100 bg-white">
       <CardHeader className="p-0">
         <div className="relative h-48 overflow-hidden">
           <img
-            src={ukm.gambar_url || defaultImage}
+            src={imageUrl}
             alt={ukm.nama_ukm}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              // Fallback to default image if uploaded image fails to load
+              const target = e.target as HTMLImageElement;
+              if (target.src !== defaultImage) {
+                target.src = defaultImage;
+              }
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
         </div>
