@@ -18,10 +18,18 @@ export default function UKMCard({ ukm, onViewDetail, showActions = false, onEdit
   const defaultImage = "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=400";
 
   // Use uploaded image URL if available, otherwise use default
-  const imageUrl = ukm.gambar_url && ukm.gambar_url.trim() !== "" ? ukm.gambar_url : defaultImage;
+  let imageUrl = ukm.gambar_url && ukm.gambar_url.trim() !== "" ? ukm.gambar_url : defaultImage;
   
-  // Debug log to check the image URL
-  console.log('UKM Image URL for', ukm.nama_ukm, ':', imageUrl);
+  // For Google Drive images, ensure we have the correct format
+  if (imageUrl && imageUrl.includes('drive.google.com') && !imageUrl.includes('uc?export=view')) {
+    // Extract file ID and convert to proper format
+    const fileIdMatch = imageUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+    if (fileIdMatch) {
+      imageUrl = `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+    }
+  }
+  
+
 
   return (
     <Card className="overflow-hidden hover-scale transition-all duration-300 border border-gray-100 bg-white">
@@ -31,8 +39,9 @@ export default function UKMCard({ ukm, onViewDetail, showActions = false, onEdit
             src={imageUrl}
             alt={ukm.nama_ukm}
             className="w-full h-full object-cover"
+            crossOrigin="anonymous"
+            referrerPolicy="no-referrer"
             onError={(e) => {
-              // Fallback to default image if uploaded image fails to load
               const target = e.target as HTMLImageElement;
               if (target.src !== defaultImage) {
                 target.src = defaultImage;

@@ -119,27 +119,14 @@ export async function registerUser(userData: any) {
 
 // Transform array data from Google Sheets to objects
 function transformUKMData(data: any[]): any[] {
-  return data.map((row: any[]) => {
-    let gambar_url = row[2];
-    
-    // Convert Google Drive sharing URL to direct view URL if needed
-    if (gambar_url && gambar_url.includes('drive.google.com')) {
-      // Extract file ID from various Google Drive URL formats
-      const fileIdMatch = gambar_url.match(/(?:\/d\/|id=|&id=)([a-zA-Z0-9-_]+)/);
-      if (fileIdMatch && fileIdMatch[1]) {
-        gambar_url = `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
-      }
-    }
-    
-    return {
-      id_ukm: row[0],
-      nama_ukm: row[1],
-      gambar_url: gambar_url,
-      deskripsi: row[3],
-      id_users: row[4],
-      prestasi: row[5]
-    };
-  });
+  return data.map((row: any[]) => ({
+    id_ukm: row[0],
+    nama_ukm: row[1],
+    gambar_url: row[2], // Use URL directly from Google Apps Script
+    deskripsi: row[3],
+    id_users: row[4],
+    prestasi: row[5]
+  }));
 }
 
 function transformUserData(userData: any[]): any {
