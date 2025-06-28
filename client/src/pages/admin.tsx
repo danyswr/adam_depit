@@ -81,10 +81,9 @@ export default function Admin() {
   // Filter UKMs by current admin user - check both userId and email
   // If id_users is empty, show all UKMs for now (will fix with proper data)
   const adminUKMs = ukms.filter((ukm: any) => {
-    // If id_users is empty or null, temporarily show for all admins
-    // This will be fixed when UKMs are created with proper user IDs
-    if (!ukm[4] || ukm[4] === "") {
-      return user?.role === "admin"; // Only show to admins when id_users is empty
+    // If id_users is empty or null, show all UKMs to admins
+    if (!ukm[4] || ukm[4] === "" || ukm[4] === undefined) {
+      return user?.role === "admin"; // Show all UKMs with empty id_users to admins
     }
     return ukm[4] === user?.userId || ukm[4] === user?.email
   })
@@ -446,7 +445,10 @@ export default function Admin() {
                                   src={
                                     ukm[2] ? 
                                       ukm[2].includes('drive.google.com') ? 
-                                        `https://drive.google.com/thumbnail?id=${ukm[2].split('id=')[1]}&sz=w200-h200-c` :
+                                        (() => {
+                                          const fileId = ukm[2].match(/[?&]id=([^&]+)/)?.[1];
+                                          return fileId ? `https://drive.google.com/thumbnail?id=${fileId}&sz=w200-h200-c` : ukm[2];
+                                        })() :
                                         ukm[2] :
                                       "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100"
                                   }
@@ -464,7 +466,7 @@ export default function Admin() {
                             </div>
                             <div>
                               <div className="font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">
-                                {ukm[1]}
+                                {ukm[1] || 'Nama UKM tidak tersedia'}
                               </div>
                               <div className="text-xs text-slate-500 flex items-center mt-1">
                                 <Clock className="w-3 h-3 mr-1" />
@@ -475,7 +477,7 @@ export default function Admin() {
                         </TableCell>
                         <TableCell>
                           <div className="max-w-xs">
-                            <p className="text-slate-700 text-sm line-clamp-2 leading-relaxed">{ukm[3]}</p>
+                            <p className="text-slate-700 text-sm line-clamp-2 leading-relaxed">{ukm[3] || 'Deskripsi tidak tersedia'}</p>
                           </div>
                         </TableCell>
                         <TableCell>
