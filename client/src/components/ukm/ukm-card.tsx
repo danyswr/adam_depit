@@ -10,9 +10,11 @@ interface UKMCardProps {
   showActions?: boolean;
   onEdit?: (ukm: UKM) => void;
   onDelete?: (ukm: UKM) => void;
+  onJoinUKM?: (ukm: UKM) => void;
+  showJoinButton?: boolean;
 }
 
-export default function UKMCard({ ukm, onViewDetail, showActions = false, onEdit, onDelete }: UKMCardProps) {
+export default function UKMCard({ ukm, onViewDetail, showActions = false, onEdit, onDelete, onJoinUKM, showJoinButton = false }: UKMCardProps) {
   const defaultImage = "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=400";
 
   return (
@@ -35,11 +37,10 @@ export default function UKMCard({ ukm, onViewDetail, showActions = false, onEdit
         <div className="flex items-center justify-between text-sm text-gray-500">
           <div className="flex items-center">
             <Calendar className="h-4 w-4 mr-1" />
-            {new Date(ukm.created_at).toLocaleDateString('id-ID')}
+            Aktif
           </div>
           <div className="flex items-center">
             <Users className="h-4 w-4 mr-1" />
-            {/* Member count would come from API if available */}
             0 Anggota
           </div>
         </div>
@@ -48,11 +49,21 @@ export default function UKMCard({ ukm, onViewDetail, showActions = false, onEdit
       <CardFooter className="p-6 pt-0">
         <div className="flex space-x-2 w-full">
           <Button 
+            variant="outline"
             className="flex-1" 
             onClick={() => onViewDetail(ukm)}
           >
             Lihat Detail
           </Button>
+          
+          {showJoinButton && onJoinUKM && (
+            <Button 
+              className="flex-1" 
+              onClick={() => onJoinUKM(ukm)}
+            >
+              Daftar UKM
+            </Button>
+          )}
           
           {showActions && (
             <>

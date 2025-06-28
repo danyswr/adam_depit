@@ -7,15 +7,26 @@ import LoginModal from "@/components/auth/login-modal";
 import RegisterModal from "@/components/auth/register-modal";
 import { UKM } from "@shared/schema";
 import { useUKMs } from "@/hooks/use-ukm";
+import { useAuth } from "@/lib/auth";
 import { Users, Calendar, TrendingUp, Award } from "lucide-react";
 
 export default function Home() {
   const [selectedUKM, setSelectedUKM] = useState<UKM | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const { isLoggedIn } = useAuth();
   const { data: ukmsResponse } = useUKMs();
 
   const ukms = ukmsResponse?.success ? ukmsResponse.data?.slice(0, 3) || [] : [];
+
+  const handleJoinUKM = (ukm: UKM) => {
+    if (!isLoggedIn) {
+      setShowLoginModal(true);
+      return;
+    }
+    // If logged in, show UKM detail modal
+    setSelectedUKM(ukm);
+  };
 
   const stats = [
     { label: "UKM Aktif", value: "25+", icon: Users },
@@ -46,9 +57,16 @@ export default function Home() {
               size="lg" 
               variant="outline" 
               className="border-white text-white hover:bg-white hover:text-primary hover-scale"
-              onClick={() => setShowRegisterModal(true)}
+              onClick={() => {
+                if (!isLoggedIn) {
+                  setShowRegisterModal(true);
+                } else {
+                  // If already logged in, navigate to portfolio
+                  window.location.href = '/portfolio';
+                }
+              }}
             >
-              Bergabung Sekarang
+              {isLoggedIn ? 'Jelajahi UKM' : 'Bergabung Sekarang'}
             </Button>
           </div>
         </div>
@@ -67,16 +85,11 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {ukms.map((ukm: any) => (
               <UKMCard
-                key={ukm[0]} // id_ukm is at index 0
-                ukm={{
-                  id_ukm: ukm[0],
-                  nama_ukm: ukm[1],
-                  gambar_url: ukm[2],
-                  deskripsi: ukm[3],
-                  created_at: ukm[4],
-                  updated_at: ukm[5],
-                }}
+                key={ukm.id_ukm}
+                ukm={ukm}
                 onViewDetail={setSelectedUKM}
+                onJoinUKM={handleJoinUKM}
+                showJoinButton={true}
               />
             ))}
           </div>
@@ -115,8 +128,26 @@ export default function Home() {
         open={!!selectedUKM}
         onOpenChange={(open) => !open && setSelectedUKM(null)}
       />
-      <LoginModal open={showLoginModal} onOpenChange={setShowLoginModal} />
-      <RegisterModal open={showRegisterModal} onOpenChange={setShowRegisterModal} />
+      <LoginModal 
+        open={showLoginModal} 
+        onOpenChange={(open) => {
+          setShowLoginModal(open);
+          if (!open && !isLoggedIn) {
+            // Switch to register modal after closing login
+            setTimeout(() => setShowRegisterModal(true), 100);
+          }
+        }} 
+      />
+      <RegisterModal 
+        open={showRegisterModal} 
+        onOpenChange={(open) => {
+          setShowRegisterModal(open);
+          if (!open && !isLoggedIn) {
+            // Switch to login modal after closing register
+            setTimeout(() => setShowLoginModal(true), 100);
+          }
+        }} 
+      />
     </div>
   );
 }
