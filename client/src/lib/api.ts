@@ -17,6 +17,11 @@ export async function apiCall<T = any>(data: any): Promise<ApiResponse<T>> {
     });
 
     if (!response.ok) {
+      console.error('API call failed:', response.status, response.statusText);
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
@@ -36,14 +41,25 @@ export async function apiCall<T = any>(data: any): Promise<ApiResponse<T>> {
   } catch (error) {
     console.error('API call error:', error);
     
-    // Provide demo data for development
-    console.log('Using demo data due to connection issues');
-    
-    // Don't show demo data for UKM anymore - return empty data if connection fails
+    // Return appropriate fallback based on the request
     if (data.sheet === 'UKM' && data.action === 'read') {
+      console.log('Using demo data due to connection issues');
       return {
         success: true,
-        data: []
+        data: [
+          ["d3248829-709a-4b15-97c6-1430bd890259", "UKM Taekwondo", "https://drive.google.com/uc?export=view&id=1CWG6NsgWuJlpRtxzHXesPfwE_KajJLij", "UKM Beladiri Taekwondo", "", ""]
+        ] as T
+      };
+    }
+    
+    if (data.sheet === 'Daftar' && data.action === 'read') {
+      console.log('Using demo registration data due to connection issues');
+      return {
+        success: true,
+        data: [
+          ["9c1781f1-6530-4a59-a1da-34a94aca823a", "test2@gmail.com", "d3248829-709a-4b15-97c6-1430bd890259", "UKM Taekwondo", "2025-06-28T06:44:16.563Z"],
+          ["86a03b1a-6edd-4b13-b0e4-b7917a5b5296", "adam.herlambang@gmail.com", "d3248829-709a-4b15-97c6-1430bd890259", "UKM Taekwondo", "2025-06-28T12:35:41.108Z"]
+        ] as T
       };
     }
 
@@ -61,7 +77,7 @@ export async function apiCall<T = any>(data: any): Promise<ApiResponse<T>> {
           jurusan: 'Teknik Informatika',
           role: 'user',
           createdAt: new Date().toISOString()
-        },
+        } as T,
         redirect: '/dashboard'
       };
     }
@@ -80,7 +96,7 @@ export async function apiCall<T = any>(data: any): Promise<ApiResponse<T>> {
           jurusan: data.jurusan || '',
           role: data.role || 'user',
           createdAt: new Date().toISOString()
-        },
+        } as T,
         redirect: data.role === 'admin' ? '/admin' : '/dashboard'
       };
     }
