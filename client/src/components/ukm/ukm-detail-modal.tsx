@@ -1,4 +1,4 @@
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { X, Users, Calendar, Star, Music, Trophy, Share } from "lucide-react";
@@ -19,6 +19,15 @@ export default function UKMDetailModal({ ukm, open, onOpenChange }: UKMDetailMod
   if (!ukm) return null;
 
   const defaultImage = "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1200&h=400";
+
+  // Process image URL for Google Drive compatibility
+  let imageUrl = ukm.gambar_url && ukm.gambar_url.trim() !== "" ? ukm.gambar_url : defaultImage;
+  if (imageUrl && imageUrl.includes('drive.google.com')) {
+    const fileIdMatch = imageUrl.match(/(?:\/d\/|id=|&id=)([a-zA-Z0-9-_]+)/);
+    if (fileIdMatch && fileIdMatch[1]) {
+      imageUrl = `https://drive.google.com/thumbnail?id=${fileIdMatch[1]}&sz=w800`;
+    }
+  }
 
   const handleJoinUKM = async () => {
     if (!isLoggedIn) {
@@ -70,6 +79,8 @@ export default function UKMDetailModal({ ukm, open, onOpenChange }: UKMDetailMod
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-screen overflow-y-auto p-0">
+        <DialogTitle className="sr-only">{ukm.nama_ukm}</DialogTitle>
+        <DialogDescription className="sr-only">{ukm.deskripsi}</DialogDescription>
         <div className="relative">
           {/* Close button */}
           <Button
@@ -84,7 +95,7 @@ export default function UKMDetailModal({ ukm, open, onOpenChange }: UKMDetailMod
           {/* Hero Image */}
           <div className="relative h-64 overflow-hidden">
             <img
-              src={ukm.gambar_url || defaultImage}
+              src={imageUrl}
               alt={ukm.nama_ukm}
               className="w-full h-full object-cover"
             />

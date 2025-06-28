@@ -240,8 +240,12 @@ export async function getUKMMemberCount(ukmId: string) {
   });
   
   if (response.success && response.data) {
-    // Count registrations for this specific UKM
-    const registrations = response.data.filter((row: any[]) => row[2] === ukmId);
+    // Based on your Daftar sheet: [id_daftar, id_user, id_ukm, nama_ukm, created_at]
+    // id_ukm is in column index 2
+    const registrations = response.data.filter((row: any[]) => {
+      return row[2] && row[2] === ukmId;
+    });
+    console.log('Member count for UKM', ukmId, ':', registrations.length, 'registrations:', registrations);
     return {
       success: true,
       data: registrations.length
