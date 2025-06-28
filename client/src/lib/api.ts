@@ -231,3 +231,25 @@ export async function getAllRegistrations(email: string) {
     email,
   });
 }
+
+export async function getUKMMemberCount(ukmId: string) {
+  const response = await apiCall({
+    sheet: 'Daftar',
+    action: 'read',
+    email: 'guest@example.com',
+  });
+  
+  if (response.success && response.data) {
+    // Count registrations for this specific UKM
+    const registrations = response.data.filter((row: any[]) => row[2] === ukmId);
+    return {
+      success: true,
+      data: registrations.length
+    };
+  }
+  
+  return {
+    success: true,
+    data: 0
+  };
+}

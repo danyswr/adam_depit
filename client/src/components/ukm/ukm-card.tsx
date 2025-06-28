@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Users } from "lucide-react";
 import { UKM } from "@shared/schema";
+import { useQuery } from "@tanstack/react-query";
+import { getUKMMemberCount } from "@/lib/api";
 
 interface UKMCardProps {
   ukm: UKM;
@@ -17,15 +19,28 @@ interface UKMCardProps {
 export default function UKMCard({ ukm, onViewDetail, showActions = false, onEdit, onDelete, onJoinUKM, showJoinButton = false }: UKMCardProps) {
   const defaultImage = "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=400";
 
+  // Fetch member count for this UKM
+  const { data: memberCountData } = useQuery({
+    queryKey: ['/api/ukm-members', ukm.id_ukm],
+    queryFn: () => getUKMMemberCount(ukm.id_ukm),
+    enabled: !!ukm.id_ukm,
+  });
+
+  const memberCount = memberCountData?.success ? (memberCountData.data || 0) : 0;
+
   // Use uploaded image URL if available, otherwise use default
   let imageUrl = ukm.gambar_url && ukm.gambar_url.trim() !== "" ? ukm.gambar_url : defaultImage;
   
-  // For Google Drive images, ensure we have the correct format
-  if (imageUrl && imageUrl.includes('drive.google.com') && !imageUrl.includes('uc?export=view')) {
-    // Extract file ID and convert to proper format
-    const fileIdMatch = imageUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+  // Check if the URL is already in the correct format from Google Apps Script
+  if (imageUrl && imageUrl.includes('drive.google.com/uc?export=view')) {
+    // URL is already in correct format from Google Apps Script
+    console.log('Using Google Drive URL from API:', imageUrl);
+  } else if (imageUrl && imageUrl.includes('drive.google.com')) {
+    // Handle other Google Drive URL formats
+    const fileIdMatch = imageUrl.match(/(?:\/d\/|id=|&id=)([a-zA-Z0-9-_]+)/);
     if (fileIdMatch) {
       imageUrl = `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+      console.log('Converted Google Drive URL:', imageUrl);
     }
   }
   
@@ -39,13 +54,17 @@ export default function UKMCard({ ukm, onViewDetail, showActions = false, onEdit
             src={imageUrl}
             alt={ukm.nama_ukm}
             className="w-full h-full object-cover"
-            crossOrigin="anonymous"
-            referrerPolicy="no-referrer"
+            loading="lazy"
             onError={(e) => {
+              console.error('Image failed to load:', imageUrl);
               const target = e.target as HTMLImageElement;
               if (target.src !== defaultImage) {
+                console.log('Falling back to default image');
                 target.src = defaultImage;
               }
+            }}
+            onLoad={() => {
+              console.log('Image loaded successfully:', imageUrl);
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
@@ -63,7 +82,7 @@ export default function UKMCard({ ukm, onViewDetail, showActions = false, onEdit
           </div>
           <div className="flex items-center">
             <Users className="h-4 w-4 mr-1" />
-            0 Anggota
+            {memberCount} Anggota
           </div>
         </div>
       </CardContent>
