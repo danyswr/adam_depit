@@ -7,8 +7,8 @@ export function useUKMs() {
   const { user } = useAuth();
   
   return useQuery({
-    queryKey: ['/api/ukms'],
-    queryFn: () => getUKMs(user?.email),
+    queryKey: ['/api/ukms', user?.email],
+    queryFn: () => getUKMs(user?.email || 'guest@example.com'),
     refetchOnWindowFocus: false,
   });
 }

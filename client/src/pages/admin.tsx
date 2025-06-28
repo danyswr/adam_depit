@@ -69,12 +69,14 @@ export default function Admin() {
   // Fetch registration data for statistics
   const { data: registrationsResponse } = useQuery({
     queryKey: ["/api/registrations", user?.email],
-    queryFn: () => getAllRegistrations(user?.email || ""),
+    queryFn: () => getAllRegistrations(user?.email || "guest@example.com"),
     enabled: !!user?.email,
   })
 
   const ukms = ukmsResponse?.success ? ukmsResponse.data || [] : []
   const registrations = registrationsResponse?.success ? registrationsResponse.data || [] : []
+
+
 
   // Filter UKMs by current admin user - check both userId and email
   // If id_users is empty, show all UKMs for now (will fix with proper data)
@@ -442,11 +444,17 @@ export default function Admin() {
                               <Avatar className="h-14 w-14 ring-2 ring-slate-200 group-hover:ring-blue-300 transition-all duration-200">
                                 <img
                                   src={
-                                    ukm[2] ||
-                                    "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100"
+                                    ukm[2] ? 
+                                      ukm[2].includes('drive.google.com') ? 
+                                        ukm[2].replace('/uc?export=view&id=', '/thumbnail?id=').replace('&', '&sz=w200-h200-c') :
+                                        ukm[2] :
+                                      "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100"
                                   }
                                   alt={ukm[1]}
                                   className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    e.currentTarget.src = "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100"
+                                  }}
                                 />
                                 <AvatarFallback className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold">
                                   {ukm[1]?.substring(0, 2).toUpperCase()}
