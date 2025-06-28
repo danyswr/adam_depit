@@ -1,0 +1,93 @@
+# UKM Portfolio Platform
+
+## Overview
+
+A full-stack web application for managing and showcasing University Student Organization (UKM) portfolios. The platform allows students to discover, join, and manage various student organizations while providing administrators with tools to manage UKM data and registrations.
+
+## System Architecture
+
+### Frontend Architecture
+- **Framework**: React with TypeScript using Vite as the build tool
+- **UI Library**: shadcn/ui with Radix UI primitives for consistent, accessible components
+- **Styling**: Tailwind CSS with custom CSS variables for theming
+- **State Management**: React Query (@tanstack/react-query) for server state management
+- **Routing**: Wouter for lightweight client-side routing
+- **Form Handling**: React Hook Form with Zod validation
+
+### Backend Architecture
+- **Primary Backend**: Google Apps Script serving as the main API endpoint
+- **Express Server**: Minimal Express.js server primarily for development and static file serving
+- **Database**: Google Sheets as the primary data store
+- **File Storage**: Google Drive for image and file uploads
+
+### Authentication Strategy
+- Client-side authentication state management
+- Session persistence via localStorage
+- Role-based access control (regular users vs admin)
+
+## Key Components
+
+### Data Layer
+- **User Management**: User registration, authentication, and profile management
+- **UKM Management**: CRUD operations for student organizations
+- **Registration System**: User-to-UKM enrollment and management
+- **File Upload**: Image handling for UKM profiles
+
+### UI Components
+- **Responsive Design**: Mobile-first approach with adaptive layouts
+- **Component Library**: Comprehensive UI components using shadcn/ui
+- **Accessibility**: ARIA-compliant components via Radix UI
+- **Theming**: CSS custom properties for light/dark mode support
+
+### Pages and Features
+- **Home Page**: Landing page with UKM showcase and statistics
+- **Portfolio Page**: Browse and filter UKMs
+- **Dashboard**: User-specific UKM management and registrations
+- **Admin Panel**: Administrative tools for UKM and user management
+
+## Data Flow
+
+1. **Client Requests**: Frontend makes API calls to Google Apps Script endpoint
+2. **Google Apps Script**: Processes requests and interacts with Google Sheets
+3. **Data Storage**: Google Sheets stores user data, UKM information, and registrations
+4. **File Storage**: Google Drive stores uploaded images and files
+5. **Response**: Data flows back through the same path to update the UI
+
+## External Dependencies
+
+### Core Technologies
+- **Google Apps Script**: Primary backend API
+- **Google Sheets**: Database for structured data
+- **Google Drive**: File storage and image hosting
+- **Neon Database**: PostgreSQL configured but not actively used (Google Sheets is primary)
+
+### NPM Packages
+- **React Ecosystem**: React 18+ with TypeScript support
+- **UI Libraries**: Radix UI primitives, Lucide React icons
+- **Data Fetching**: TanStack React Query for caching and state management
+- **Validation**: Zod for schema validation and type safety
+- **Styling**: Tailwind CSS with class-variance-authority for component variants
+
+## Deployment Strategy
+
+### Development Environment
+- **Vite Dev Server**: Hot module replacement and fast builds
+- **Express Server**: Serves frontend in development with proxy capabilities
+- **Environment Variables**: DATABASE_URL for potential PostgreSQL integration
+
+### Production Build
+- **Static Frontend**: Built with Vite and served as static files
+- **Backend**: Google Apps Script hosted on Google's infrastructure
+- **CDN Integration**: Potential for serving static assets via CDN
+
+### Configuration Management
+- **TypeScript**: Strict type checking with path aliases
+- **Build Tools**: ESBuild for server bundling, Vite for client bundling
+- **Development Tools**: Replit integration with runtime error overlay
+
+## Changelog
+- June 28, 2025. Initial setup
+
+## User Preferences
+
+Preferred communication style: Simple, everyday language.
