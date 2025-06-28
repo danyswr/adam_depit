@@ -98,6 +98,8 @@ A full-stack web application for managing and showcasing University Student Orga
 - June 28, 2025: Added admin restriction to only access UKMs they created
 - June 28, 2025: Fixed Google Drive image display issues - images now load correctly in UKM cards
 - June 28, 2025: Completed migration to standard Replit environment with all features working
+- June 28, 2025: Resolved Google Drive image loading by switching to thumbnail API format
+- June 28, 2025: Fixed member count display to show actual registrations from Google Sheets
 
 ## Setup Instructions
 To connect the website with Google Sheets:

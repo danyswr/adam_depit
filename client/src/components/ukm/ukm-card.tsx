@@ -31,16 +31,13 @@ export default function UKMCard({ ukm, onViewDetail, showActions = false, onEdit
   // Use uploaded image URL if available, otherwise use default
   let imageUrl = ukm.gambar_url && ukm.gambar_url.trim() !== "" ? ukm.gambar_url : defaultImage;
   
-  // Check if the URL is already in the correct format from Google Apps Script
-  if (imageUrl && imageUrl.includes('drive.google.com/uc?export=view')) {
-    // URL is already in correct format from Google Apps Script
-    console.log('Using Google Drive URL from API:', imageUrl);
-  } else if (imageUrl && imageUrl.includes('drive.google.com')) {
-    // Handle other Google Drive URL formats
+  // Convert Google Drive URLs to thumbnail format for better web compatibility
+  if (imageUrl && imageUrl.includes('drive.google.com')) {
     const fileIdMatch = imageUrl.match(/(?:\/d\/|id=|&id=)([a-zA-Z0-9-_]+)/);
-    if (fileIdMatch) {
-      imageUrl = `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
-      console.log('Converted Google Drive URL:', imageUrl);
+    if (fileIdMatch && fileIdMatch[1]) {
+      // Use Google Drive thumbnail API instead of uc?export=view
+      imageUrl = `https://drive.google.com/thumbnail?id=${fileIdMatch[1]}&sz=w800`;
+
     }
   }
   
@@ -56,15 +53,10 @@ export default function UKMCard({ ukm, onViewDetail, showActions = false, onEdit
             className="w-full h-full object-cover"
             loading="lazy"
             onError={(e) => {
-              console.error('Image failed to load:', imageUrl);
               const target = e.target as HTMLImageElement;
               if (target.src !== defaultImage) {
-                console.log('Falling back to default image');
                 target.src = defaultImage;
               }
-            }}
-            onLoad={() => {
-              console.log('Image loaded successfully:', imageUrl);
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
