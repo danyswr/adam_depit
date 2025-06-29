@@ -218,7 +218,7 @@ export default function Portfolio() {
                 </div>
               </div>
               <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-amber-800 via-yellow-700 to-orange-700 bg-clip-text text-transparent mb-6 leading-tight">
-                Portfolio UKM
+                KumpulUKM
               </h1>
               <p className="text-xl md:text-2xl text-amber-700/80 max-w-4xl mx-auto leading-relaxed mb-12">
                 Jelajahi berbagai Unit Kegiatan Mahasiswa dan temukan komunitas
@@ -639,7 +639,7 @@ export default function Portfolio() {
                   <Loader2 className="h-10 w-10 animate-spin text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-amber-800 mb-3">
-                  Memuat Portfolio UKM
+                  Memuat KumpulUKM
                 </h3>
                 <p className="text-lg text-amber-700 mb-6">
                   Sedang mengambil data terbaru untuk Anda
@@ -670,10 +670,7 @@ export default function Portfolio() {
                     className="animate-in fade-in slide-in-from-bottom-4 duration-700"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
-                    <UKMCard
-                      ukm={ukm}
-                      onViewDetail={setSelectedUKM}
-                    />
+                    <UKMCard ukm={ukm} onViewDetail={setSelectedUKM} />
                   </div>
                 ))}
               </div>

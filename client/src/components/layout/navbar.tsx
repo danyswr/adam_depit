@@ -92,7 +92,7 @@ export default function Navbar() {
                     <Sparkles className="w-5 h-5 text-white" />
                   </div>
                   <h1 className="text-xl font-bold bg-gradient-to-r from-amber-600 to-yellow-600 bg-clip-text text-transparent">
-                    Portfolio UKM
+                    KumpulUKM
                   </h1>
                 </div>
               </Link>
@@ -239,7 +239,7 @@ export default function Navbar() {
                         <Sparkles className="w-6 h-6 text-white" />
                       </div>
                       <h2 className="text-lg font-bold bg-gradient-to-r from-amber-600 to-yellow-600 bg-clip-text text-transparent">
-                        Portfolio UKM
+                        KumpulUKM
                       </h2>
                     </div>
 

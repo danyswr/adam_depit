@@ -202,7 +202,7 @@ export default function RegisterModal({
                 <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mr-4">
                   <Sparkles className="w-7 h-7 text-white" />
                 </div>
-                <h1 className="text-2xl font-bold">Portfolio UKM</h1>
+                <h1 className="text-2xl font-bold">KumpulUKM</h1>
               </div>
 
               {/* Main Content */}

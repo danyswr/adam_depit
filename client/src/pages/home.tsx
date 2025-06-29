@@ -89,7 +89,7 @@ export default function Home() {
     ? ukmsResponse.data?.slice(0, 6) || []
     : [];
   const showDemoAlert = !ukmsResponse?.success;
-  
+
   // Debug logging
   console.log("Home UKMs response:", ukmsResponse);
   console.log("Home UKMs data:", ukms);
@@ -285,7 +285,7 @@ export default function Home() {
             {/* Title */}
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
               <span className="bg-gradient-to-r from-amber-800 to-yellow-700 bg-clip-text text-transparent">
-                Portfolio UKM
+                KumpulUKM
               </span>
               <br />
               <span className="text-3xl md:text-5xl bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent">
